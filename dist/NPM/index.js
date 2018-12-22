@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-// Reflect, WeakMap, Object, Set, Proxy
+const version = '1.0.0';
 
 const { defineProperty, deleteProperty, ownKeys } = Reflect;
 
@@ -30,6 +30,8 @@ const orderify = object => {
 	ownKeysKeepers.set(object, new Set(ownKeys(object)));
 	return new Proxy(object, handlers);
 };
+
+orderify.version = version;
 
 orderify.default = orderify;
 
