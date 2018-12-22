@@ -31,6 +31,8 @@ const orderify = object => {
 	return new Proxy(object, handlers);
 };
 
+orderify.default = orderify;
+
 module.exports = orderify;
 
 //# sourceMappingURL=index.js.map
