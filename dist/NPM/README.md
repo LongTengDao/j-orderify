@@ -4,17 +4,25 @@
 
 const orderify = require('@ltd/j-orderify');
 
-const object = orderify({});
-object[Symbol()] = 'symbol';
-object.string = 'string';
-object[1] = 'integer-string';
+const object = {};
 
-const ownValues = [];
-for ( const key of Reflect.ownKeys(object) ) { ownValues.push(object[key]); }
-values.join(', ')==='symbol, string, integer-string';
+const proxy = orderify(object);
 
-const values = [];
-for ( const key in object ) { values.push(object[key]); }
-values.join(', ')==='string, integer-string';
+proxy[Symbol()] = '1. symbol';
+proxy.string = '2. string';
+proxy[1] = '3. integer-string';
+
+for ( const key of Reflect.ownKeys(proxy) ) {
+	console.log(proxy[key]);
+	// "1. symbol"
+	// "2. string"
+	// "3. integer-string"
+}
+
+for ( const key in proxy ) {
+	console.log(proxy[key]);
+	// "1. string"
+	// "2. integer-string"
+}
 
 ```
