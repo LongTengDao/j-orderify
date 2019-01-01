@@ -26,15 +26,15 @@ const handlers = Object.assign(Object.create(null), {
 	},
 });
 
-const orderify = object => {
-	ownKeysKeepers.set(object, new Set(ownKeys(object)));
-	return new Proxy(object, handlers);
-};
+const _export = (()=>{
+	const orderify = object => {
+		ownKeysKeepers.set(object, new Set(ownKeys(object)));
+		return new Proxy(object, handlers);
+	};
+	orderify.version = version;
+	return orderify.orderify = orderify.default = orderify;
+})();
 
-orderify.version = version;
-
-orderify.default = orderify;
-
-module.exports = orderify;
+module.exports = _export;
 
 //# sourceMappingURL=index.js.map

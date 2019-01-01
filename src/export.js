@@ -1,5 +1,4 @@
 import version from './version?text';// Reflect, WeakMap, Object, Set, Proxy
-export { version };
 
 const { defineProperty, deleteProperty, ownKeys } = Reflect;
 
@@ -25,13 +24,18 @@ const handlers = Object.assign(Object.create(null), {
 	},
 });
 
-const orderify = object => {
+export const orderify = object => {
 	ownKeysKeepers.set(object, new Set(ownKeys(object)));
 	return new Proxy(object, handlers);
 };
 
-orderify.version = version;
+export { version };
 
-orderify.default = orderify;
-
-export default orderify;
+export default (()=>{
+	const orderify = object => {
+		ownKeysKeepers.set(object, new Set(ownKeys(object)));
+		return new Proxy(object, handlers);
+	};
+	orderify.version = version;
+	return orderify.orderify = orderify.default = orderify;
+})();
