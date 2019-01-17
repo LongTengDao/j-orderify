@@ -16,6 +16,9 @@ require('../test/test.js')(async ({ build, read, copy }) => {
 				description: 'Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.／返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。',
 			}
 		},
+		UMD: {
+			main_global: 'orderify',
+		},
 	});
 	
 	await copy(
