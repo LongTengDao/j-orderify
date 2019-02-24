@@ -5,6 +5,8 @@
 		3,
 	"file":
 		"index.js",
+	"sourceRoot":
+		"../../src/",
 	"sources":
 		["version?text","export.js"],
 	"mappings":
