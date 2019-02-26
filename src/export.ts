@@ -38,7 +38,7 @@ export const orderify = (object :object) :object => {
 
 export { version };
 
-export default ( () :Function => {
+export default ( () => {
 	const orderify = (object :object) :object => {
 		ownKeysKeepers.set(object, new Set(ownKeys(object)));
 		return new Proxy(object, handlers);
