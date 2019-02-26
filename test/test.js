@@ -2,7 +2,7 @@
 
 module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_default }) => {
 	
-	const orderify = await import_default('src/default.js');
+	const orderify = await import_default('src/default');
 	
 	const object = {};
 	prepare(object);
