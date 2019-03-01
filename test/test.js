@@ -1,14 +1,18 @@
 'use strict';
 
-module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_default }) => {
+module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_ }) => {
 	
-	const orderify = await import_default('src/default');
+	const { orderify, Orderified } = await import_('src/export');
 	
 	const object = {};
 	prepare(object);
 	compare(object, 'integer-string, string, symbol');
 	
-	const proxy = orderify({});
+	let proxy = orderify({});
+	prepare(proxy);
+	compare(proxy, 'symbol, string, integer-string');
+	
+	proxy = new Orderified;
 	prepare(proxy);
 	compare(proxy, 'symbol, string, integer-string');
 	

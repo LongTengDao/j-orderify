@@ -1,9 +1,10 @@
 ﻿'use strict';
 
-const version = '1.0.0';
+const version = '2.0.0';
 
 // @ts-ignore
 const { defineProperty, deleteProperty, ownKeys } = Reflect;
+const { create } = Object;
 const ownKeysKeepers = new WeakMap;
 const handlers = Object.create(null, {
     defineProperty: {
@@ -30,14 +31,23 @@ const handlers = Object.create(null, {
         }
     },
 });
-const _export = (() => {
-    const orderify = (object) => {
-        ownKeysKeepers.set(object, new Set(ownKeys(object)));
+const orderify = (object) => {
+    ownKeysKeepers.set(object, new Set(ownKeys(object)));
+    return new Proxy(object, handlers);
+};
+class Orderified extends null {
+    constructor() {
+        const object = create(null);
+        ownKeysKeepers.set(object, new Set);
         return new Proxy(object, handlers);
-    };
-    orderify.version = version;
-    return orderify.orderify = orderify.default = orderify;
-})();
+    }
+}
+const _export = {
+    version,
+    orderify,
+    Orderified,
+    get default() { return this; },
+};
 
 module.exports = _export;
 
