@@ -3,7 +3,6 @@
 		"target": "ESNext",
 		"experimentalDecorators": true,
 		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"noUnusedLocals": true
+		"noImplicitThis": true
 	}
 }
