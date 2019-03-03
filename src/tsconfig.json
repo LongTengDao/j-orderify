@@ -3,6 +3,8 @@
 		"target": "ESNext",
 		"experimentalDecorators": true,
 		"noImplicitReturns": true,
-		"noImplicitThis": true
+		"noImplicitThis": true,
+		"strictNullChecks": true,
+		"alwaysStrict": true
 	}
 }
