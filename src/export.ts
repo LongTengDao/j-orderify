@@ -39,7 +39,7 @@ export const orderify = (object :object) :object => {
 
 let create = (proto :typeof prototype) :Orderified => {
 	delete proto.constructor;
-	if ( ownKeys(proto).length ) { throw new Error(''); }
+	if ( ownKeys(proto).length ) { throw new TypeError('Orderified.prototype is not extensible'); }
 	Object.freeze(proto);
 	create = Object.create;
 	return create(proto);

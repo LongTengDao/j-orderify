@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '2.1.1';
+const version = '2.1.2';
 
 // @ts-ignore
 const { defineProperty, deleteProperty, ownKeys } = Reflect;
@@ -37,7 +37,7 @@ const orderify = (object) => {
 let create = (proto) => {
     delete proto.constructor;
     if (ownKeys(proto).length) {
-        throw new Error('');
+        throw new TypeError('Orderified.prototype is not extensible');
     }
     Object.freeze(proto);
     create = Object.create;
