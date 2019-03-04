@@ -3,7 +3,6 @@ import version from './version?text';// Reflect, WeakMap, Object, Set, Proxy
 export { version };
 
 const { defineProperty, deleteProperty, ownKeys } = Reflect;
-const { create } = Object;
 
 const ownKeysKeepers = new WeakMap;
 
@@ -38,16 +37,23 @@ export const orderify = (object :object) :object => {
 	return new Proxy(object, handlers);
 };
 
+let create = (proto :typeof prototype) :Orderified => {
+	delete proto.constructor;
+	if ( ownKeys(proto).length ) { throw new Error(''); }
+	Object.freeze(proto);
+	create = Object.create;
+	return create(proto);
+};
+
 export class Orderified extends null {
 	constructor () {
-		const object :object = create(prototype);
+		const object :Orderified = create(prototype);
 		ownKeysKeepers.set(object, new Set);
 		return new Proxy(object, handlers);
 	}
 }
+
 const { prototype } = Orderified;
-delete prototype.constructor;
-Object.freeze(prototype);
 
 export default {
 	version,

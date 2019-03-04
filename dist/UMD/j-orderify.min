@@ -2,11 +2,11 @@
  * 模块名称：@ltd/j-orderify
  * 模块功能：返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。
    　　　　　Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.
- * 模块版本：2.1.0
+ * 模块版本：2.1.1
  * 许可条款：LGPL-3.0
  * 所属作者：龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)
  * 问题反馈：https://GitHub.com/LongTengDao/j-orderify/issues
  * 项目主页：https://GitHub.com/LongTengDao/j-orderify/
  */
-(function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e=e||self).orderify=t()})(this,function(){"use strict";const{defineProperty:e,deleteProperty:t,ownKeys:r}=Reflect,{create:n}=Object,o=new WeakMap,d=Object.create(null,{defineProperty:{value:(t,r,n)=>!!e(t,r,n)&&(o.get(t).add(r),!0)},deleteProperty:{value:(e,r)=>!!t(e,r)&&(o.get(e).delete(r),!0)},ownKeys:{value:e=>[...o.get(e)]}});class s extends(null){constructor(){const e=n(c);return o.set(e,new Set),new Proxy(e,d)}}const{prototype:c}=s;return delete c.constructor,Object.freeze(c),{version:"2.1.0",orderify:e=>(o.set(e,new Set(r(e))),new Proxy(e,d)),Orderified:s,get default(){return this}}});
+(function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):(e=e||self).orderify=t()})(this,function(){"use strict";const{defineProperty:e,deleteProperty:t,ownKeys:r}=Reflect,n=new WeakMap,o=Object.create(null,{defineProperty:{value:(t,r,o)=>!!e(t,r,o)&&(n.get(t).add(r),!0)},deleteProperty:{value:(e,r)=>!!t(e,r)&&(n.get(e).delete(r),!0)},ownKeys:{value:e=>[...n.get(e)]}});let d=e=>{if(delete e.constructor,r(e).length)throw new Error("");return Object.freeze(e),(d=Object.create)(e)};class f extends(null){constructor(){const e=d(s);return n.set(e,new Set),new Proxy(e,o)}}const{prototype:s}=f;return{version:"2.1.1",orderify:e=>(n.set(e,new Set(r(e))),new Proxy(e,o)),Orderified:f,get default(){return this}}});
 //# sourceMappingURL=j-orderify.min.js.map
