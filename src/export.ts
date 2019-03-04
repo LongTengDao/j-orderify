@@ -40,11 +40,14 @@ export const orderify = (object :object) :object => {
 
 export class Orderified extends null {
 	constructor () {
-		const object :object = create(null);
+		const object :object = create(prototype);
 		ownKeysKeepers.set(object, new Set);
 		return new Proxy(object, handlers);
 	}
 }
+const { prototype } = Orderified;
+delete prototype.constructor;
+Object.freeze(prototype);
 
 export default {
 	version,

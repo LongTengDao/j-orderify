@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '2.0.0';
+const version = '2.1.0';
 
 // @ts-ignore
 const { defineProperty, deleteProperty, ownKeys } = Reflect;
@@ -37,11 +37,14 @@ const orderify = (object) => {
 };
 class Orderified extends null {
     constructor() {
-        const object = create(null);
+        const object = create(prototype);
         ownKeysKeepers.set(object, new Set);
         return new Proxy(object, handlers);
     }
 }
+const { prototype } = Orderified;
+delete prototype.constructor;
+Object.freeze(prototype);
 const _export = {
     version,
     orderify,

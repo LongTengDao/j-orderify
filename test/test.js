@@ -16,6 +16,10 @@ module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_ }) => {
 	prepare(proxy);
 	compare(proxy, 'symbol, string, integer-string');
 	
+	if ( !( proxy instanceof Orderified ) ) { throw new Error; }
+	if ( 'constructor' in proxy ) { throw new Error; }
+	if ( Reflect.ownKeys(Reflect.getPrototypeOf(proxy)).length ) { throw new Error; }
+	
 });
 
 function prepare (object) {
