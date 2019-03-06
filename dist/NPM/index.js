@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '2.3.1';
+const version = '2.4.0';
 
 const create = Object.create;
 
