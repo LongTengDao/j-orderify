@@ -13,6 +13,7 @@ module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_ }) => {
 	compare(proxy, 'symbol, string, integer-string, symbol, string, integer-string');
 	
 	proxy = new Orderified;
+	if ( 'constructor' in proxy ) { throw new Error('Orderified.prototype'); }
 	prepare(proxy);
 	compare(proxy, 'symbol, string, integer-string, symbol, string, integer-string');
 	

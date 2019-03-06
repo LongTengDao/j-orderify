@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '2.3.0';
+const version = '2.3.1';
 
 const create = Object.create;
 
@@ -47,7 +47,11 @@ class Orderified extends null {
         return new Proxy(object, handlers);
     }
 }
-const { prototype } = Orderified;
+const prototype = /*#__PURE__*/ function () {
+    delete Orderified.prototype.constructor;
+    Object.freeze(Orderified.prototype);
+    return Orderified.prototype;
+}();
 const _export = {
     version,
     orderify,

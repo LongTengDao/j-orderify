@@ -51,11 +51,11 @@ export class Orderified extends null {
 	}
 }
 
-const { prototype } = Orderified;
-(/*#__PURE__*/function () {
-	delete prototype.constructor;
-	Object.freeze(prototype);
-}());
+const prototype = /*#__PURE__*/ function () {
+	delete Orderified.prototype.constructor;
+	Object.freeze(Orderified.prototype);
+	return Orderified.prototype;
+}();
 
 export default {
 	version,
