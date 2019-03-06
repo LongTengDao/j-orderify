@@ -3,6 +3,7 @@ export { version };
 
 import WeakMap from '.WeakMap';
 import Object from '.Object';
+import create from '.Object.create';
 import Set from '.Set';
 import Proxy from '.Proxy';
 import defineProperty from '.Reflect.defineProperty';
@@ -42,14 +43,6 @@ export const orderify = (object :object) :object => {
 	return new Proxy(object, handlers);
 };
 
-let create = (proto :typeof prototype) :Orderified => {
-	delete proto.constructor;
-	if ( ownKeys(proto).length ) { throw new TypeError('Orderified.prototype is not extensible'); }
-	Object.freeze(proto);
-	create = Object.create;
-	return create(proto);
-};
-
 export class Orderified extends null {
 	constructor () {
 		const object :Orderified = create(prototype);
@@ -59,6 +52,10 @@ export class Orderified extends null {
 }
 
 const { prototype } = Orderified;
+(/*#__PURE__*/function () {
+	delete prototype.constructor;
+	Object.freeze(prototype);
+}());
 
 export default {
 	version,

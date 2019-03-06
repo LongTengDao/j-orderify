@@ -1,6 +1,8 @@
 ﻿'use strict';
 
-const version = '2.2.0';
+const version = '2.3.0';
+
+const create = Object.create;
 
 const defineProperty = Reflect.defineProperty;
 
@@ -37,15 +39,6 @@ const handlers = Object.create(null, {
 const orderify = (object) => {
     ownKeysKeepers.set(object, new Set(ownKeys(object)));
     return new Proxy(object, handlers);
-};
-let create = (proto) => {
-    delete proto.constructor;
-    if (ownKeys(proto).length) {
-        throw new TypeError('Orderified.prototype is not extensible');
-    }
-    Object.freeze(proto);
-    create = Object.create;
-    return create(proto);
 };
 class Orderified extends null {
     constructor() {
