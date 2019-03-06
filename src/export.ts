@@ -1,8 +1,13 @@
-// @ts-ignore
-import version from './version?text';// Reflect, WeakMap, Object, Set, Proxy
+import version from './version?text';
 export { version };
 
-const { defineProperty, deleteProperty, ownKeys } = Reflect;
+import WeakMap from '.WeakMap';
+import Object from '.Object';
+import Set from '.Set';
+import Proxy from '.Proxy';
+import defineProperty from '.Reflect.defineProperty';
+import deleteProperty from '.Reflect.deleteProperty';
+import ownKeys from '.Reflect.ownKeys';
 
 const ownKeysKeepers = new WeakMap;
 

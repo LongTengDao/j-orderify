@@ -1,9 +1,13 @@
 ﻿'use strict';
 
-const version = '2.1.2';
+const version = '2.2.0';
 
-// @ts-ignore
-const { defineProperty, deleteProperty, ownKeys } = Reflect;
+const defineProperty = Reflect.defineProperty;
+
+const deleteProperty = Reflect.deleteProperty;
+
+const ownKeys = Reflect.ownKeys;
+
 const ownKeysKeepers = new WeakMap;
 const handlers = Object.create(null, {
     defineProperty: {
