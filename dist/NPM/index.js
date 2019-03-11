@@ -1,6 +1,6 @@
 ﻿'use strict';
 
-const version = '2.4.0';
+const version = '2.5.0';
 
 const create = Object.create;
 
@@ -11,7 +11,7 @@ const deleteProperty = Reflect.deleteProperty;
 const ownKeys = Reflect.ownKeys;
 
 const ownKeysKeepers = new WeakMap;
-const handlers = Object.create(null, {
+const handlers = create(null, {
     defineProperty: {
         value(target, key, descriptor) {
             if (defineProperty(target, key, descriptor)) {

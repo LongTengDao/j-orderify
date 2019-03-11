@@ -12,7 +12,7 @@ import ownKeys from '.Reflect.ownKeys';
 
 const ownKeysKeepers = new WeakMap;
 
-const handlers :object = Object.create(null, {
+const handlers :object = create(null, {
 	defineProperty: {
 		value (target :object, key :string | symbol, descriptor :PropertyDescriptor) {
 			if ( defineProperty(target, key, descriptor) ) {
