@@ -1,9 +1,9 @@
 export = exports;
-type exports = {
-	version :'2.7.0'
+declare const exports :{
+	version :'2.7.1'
 	orderify (object :object) :object
 	Orderified :typeof Orderified
-	default :exports
+	default :typeof exports
 };
 declare class Orderified extends null {
 	constructor ()
