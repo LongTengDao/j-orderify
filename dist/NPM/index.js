@@ -1,8 +1,10 @@
 ﻿'use strict';
 
-const version = '2.7.1';
+const version = '3.0.0';
 
-const create = Object.create;
+const Object_create = Object.create;
+
+const assign = Object.assign;
 
 const defineProperty = Reflect.defineProperty;
 
@@ -10,52 +12,59 @@ const deleteProperty = Reflect.deleteProperty;
 
 const ownKeys = Reflect.ownKeys;
 
-const ownKeysKeepers = new WeakMap;
-const handlers = create(null, {
-    defineProperty: {
-        value(target, key, descriptor) {
-            if (defineProperty(target, key, descriptor)) {
-                ownKeysKeepers.get(target).add(key);
-                return true;
-            }
-            return false;
+const construct = Reflect.construct;
+
+const ownKeysKeepers = new WeakMap();
+const handlers = 
+/*#__PURE__*/
+assign(Object_create(null), {
+    defineProperty(target, key, descriptor) {
+        if (defineProperty(target, key, descriptor)) {
+            ownKeysKeepers.get(target).add(key);
+            return true;
         }
+        return false;
     },
-    deleteProperty: {
-        value(target, key) {
-            if (deleteProperty(target, key)) {
-                ownKeysKeepers.get(target).delete(key);
-                return true;
-            }
-            return false;
+    deleteProperty(target, key) {
+        if (deleteProperty(target, key)) {
+            ownKeysKeepers.get(target).delete(key);
+            return true;
         }
+        return false;
     },
-    ownKeys: {
-        value(target) {
-            return [...ownKeysKeepers.get(target)];
-        }
+    ownKeys(target) {
+        return [...ownKeysKeepers.get(target)];
     },
 });
-const orderify = (object) => {
-    ownKeysKeepers.set(object, new Set(ownKeys(object)));
-    return new Proxy(object, handlers);
+const { of } = {
+    of(object) {
+        ownKeysKeepers.set(object, new Set(ownKeys(object)));
+        return new Proxy(object, handlers);
+    }
 };
-class Orderified extends null {
-    constructor() {
-        const object = create(prototype);
+const { create } = {
+    create(proto) {
+        const object = Object_create(proto);
         ownKeysKeepers.set(object, new Set);
         return new Proxy(object, handlers);
     }
-}
-const prototype = /*#__PURE__*/ function () {
-    delete Orderified.prototype.constructor;
-    Object.freeze(Orderified.prototype);
-    return Orderified.prototype;
-}();
+};
+const { extend } = {
+    extend(Class) {
+        return new Proxy(Class, assign(Object_create(null), {
+            construct(Class, args) {
+                const object = construct(Class, args);
+                ownKeysKeepers.set(object, new Set(ownKeys(object)));
+                return new Proxy(object, handlers);
+            },
+        }));
+    }
+};
 const _export = {
     version,
-    orderify,
-    Orderified,
+    of,
+    create,
+    extend,
     get default() { return this; },
 };
 

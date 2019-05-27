@@ -2,20 +2,41 @@
 
 module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_ }) => {
 	
-	const { orderify, Orderified } = await import_('src/export');
+	const { of, create, extend } = await import_('src/export');
 	
 	const object = {};
 	prepare(object);
-	compare(object, 'integer-string, integer-string, string, string, symbol, symbol');
+	compare(object, [
+		'string (decimal integer)',
+		'string (decimal integer)',
+		
+		'string',
+		'string',
+		
+		'symbol',
+		'symbol',
+	]);
 	
-	let proxy = orderify({});
-	prepare(proxy);
-	compare(proxy, 'symbol, string, integer-string, symbol, string, integer-string');
+	for ( const orderedObject of [
+		of({}),
+		create(null),
+		create(Object.prototype),
+		create(object), new ( extend(Object) )
+	] ) {
+		prepare(orderedObject);
+		compare(orderedObject, [
+			'symbol',
+			'string',
+			'string (decimal integer)',
+			
+			'symbol',
+			'string',
+			'string (decimal integer)',
+		]);
+	}
 	
-	proxy = new Orderified;
-	if ( 'constructor' in proxy ) { throw new Error('Orderified.prototype'); }
-	prepare(proxy);
-	compare(proxy, 'symbol, string, integer-string, symbol, string, integer-string');
+	if ( Reflect.getPrototypeOf(create(null))!==null ) { throw Error('__proto__!==null'); }
+	if ( Reflect.getPrototypeOf(create(object))!==object ) { throw Error('__proto__!==object'); }
 	
 });
 
@@ -23,16 +44,16 @@ function prepare (object) {
 	
 	object[Symbol(1)] = 'symbol';
 	object.string1 = 'string';
-	object[1] = 'integer-string';
+	object[1] = 'string (decimal integer)';
 	
 	object[Symbol(2)] = 'symbol';
 	object.string2 = 'string';
-	object[2] = 'integer-string';
+	object[2] = 'string (decimal integer)';
 	
 }
 
-function compare (object, ownKeys) {
-	if ( Reflect.ownKeys(object).map(key => object[key]).join(', ')!==ownKeys ) {
+function compare (object, expect) {
+	if ( JSON.stringify(Reflect.ownKeys(object).map(key => object[key]))!==JSON.stringify(expect) ) {
 		throw new Error;
 	}
 }

@@ -1,28 +1,40 @@
 ﻿
 ```js
-'use strict';
+"use strict";
 
-const orderify = require('@ltd/j-orderify');
+const { of, create, extend } = require("@ltd/j-orderify");
 
-const object = {};
+const object = Object.create(null);
 
-const proxy = orderify(object);
+const Class = Object.setPrototypeOf(class Class { }, null);
 
-proxy[Symbol()] = '1. symbol';
-proxy.string = '2. string';
-proxy[1] = '3. integer-string';
+const OrderedClass = extend(Class);
 
-for ( const key of Reflect.ownKeys(proxy) ) {
-	console.log(proxy[key]);
-	// "1. symbol"
-	// "2. string"
-	// "3. integer-string"
-}
-
-for ( const key in proxy ) {
-	console.log(proxy[key]);
-	// "1. string"
-	// "2. integer-string"
+for ( const orderedObject of [
+	of(object),
+	create(null),
+	create(Class.prototype),
+	of(new Class),
+	new OrderedClass,
+] ) {
+	
+	orderedObject[Symbol()] = "1. symbol";
+	orderedObject["__proto__"] = "2. string";
+	orderedObject[0] = "3. string (decimal integer)";
+	
+	for ( const key of Reflect.ownKeys(orderedObject) ) {
+		console.log(orderedObject[key]);
+		// "1. symbol"
+		// "2. string"
+		// "3. string (decimal integer)"
+	}
+	
+	for ( const key in orderedObject ) {
+		console.log(orderedObject[key]);
+		// "1. string"
+		// "2. string (decimal integer)"
+	}
+	
 }
 
 ```

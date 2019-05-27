@@ -1,10 +1,8 @@
 export = exports;
 declare const exports :{
-	version :'2.7.1'
-	orderify (object :object) :object
-	Orderified :typeof Orderified
+	version :'3.0.0'
+	of<target extends object> (object :target) :target
+	create<target extends object> (proto :target | null) :target
+	extend<Target extends { new (...args :any[]) :any }> (Class :Target) :Target
 	default :typeof exports
 };
-declare class Orderified extends null {
-	constructor ()
-}

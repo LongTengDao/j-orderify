@@ -1,11 +1,8 @@
 {
 	"compilerOptions": {
 		"target": "ESNext",
-		"experimentalDecorators": true,
+		"strict": true,
 		"noImplicitReturns": true,
-		"noImplicitThis": true,
-		"strictNullChecks": true,
-		"alwaysStrict": true,
 		"noUnusedLocals": true
 	}
 }
