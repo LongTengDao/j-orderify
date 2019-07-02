@@ -1,4 +1,13 @@
-﻿'use strict';
+﻿/*!
+ * 模块名称：j-orderify
+ * 模块功能：返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。
+   　　　　　Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.
+ * 模块版本：5.0.0
+ * 许可条款：LGPL-3.0
+ * 所属作者：龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)
+ * 问题反馈：https://GitHub.com/LongTengDao/j-orderify/issues
+ * 项目主页：https://GitHub.com/LongTengDao/j-orderify/
+ */
 
 const assign = Object.assign;
 
@@ -330,6 +339,9 @@ freeze({
     get default() { return this; },
 }));
 
-module.exports = _export;
+export default _export;
+export { NULL, create$1 as create, defineProperties$1 as defineProperties, fromEntries$1 as fromEntries, getOwnPropertyDescriptors, is$1 as is, isOrdered, orderify, version };
 
-//# sourceMappingURL=index.js.map
+/*¡ j-orderify */
+
+//# sourceMappingURL=index.mjs.map

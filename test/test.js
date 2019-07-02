@@ -1,59 +1,31 @@
 'use strict';
 
-module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_ }) => {
+module.exports = require('@ltd/j-dev')(__dirname+'/..')(async ({ import_default }) => {
 	
-	const { of, create, extend } = await import_('src/export');
+	const { orderify } = await import_default('src/default');
 	
-	const object = {};
-	prepare(object);
-	compare(object, [
-		'string (decimal integer)',
-		'string (decimal integer)',
-		
-		'string',
-		'string',
-		
-		'symbol',
-		'symbol',
-	]);
+	const object = orderify(Object.create(null));
 	
-	for ( const orderedObject of [
-		of({}),
-		create(null),
-		create(Object.prototype),
-		create(object), new ( extend(Object) )
-	] ) {
-		prepare(orderedObject);
-		compare(orderedObject, [
-			'symbol',
-			'string',
-			'string (decimal integer)',
-			
-			'symbol',
-			'string',
-			'string (decimal integer)',
-		]);
+	object[Symbol('A')] = 1;
+	object['_________'] = 2;
+	object[10000000000] = 3;
+	object[Symbol('B')] = 4;
+	object['__proto__'] = 5;
+	object[11111111111] = 6;
+	
+	let index = 0;
+	for ( const key of Reflect.ownKeys(object) ) {
+		if ( object[key]!== ++index ) { throw Error('Reflect.ownKeys'); }
 	}
 	
-	if ( Reflect.getPrototypeOf(create(null))!==null ) { throw Error('__proto__!==null'); }
-	if ( Reflect.getPrototypeOf(create(object))!==object ) { throw Error('__proto__!==object'); }
+	const indexes = [ 2, 3, 5, 6 ];
+	for ( const key in object ) {
+		if ( object[key]!==indexes.shift() ) { throw Error('for/in'); }
+	}
+	
+	class MyArray extends orderify(Array) { k () {} }
+	const ma = new MyArray;
+	if ( !Array.isArray(ma) ) { throw Error('Array.isArray'); }
+	ma.k();
 	
 });
-
-function prepare (object) {
-	
-	object[Symbol(1)] = 'symbol';
-	object.string1 = 'string';
-	object[1] = 'string (decimal integer)';
-	
-	object[Symbol(2)] = 'symbol';
-	object.string2 = 'string';
-	object[2] = 'string (decimal integer)';
-	
-}
-
-function compare (object, expect) {
-	if ( JSON.stringify(Reflect.ownKeys(object).map(key => object[key]))!==JSON.stringify(expect) ) {
-		throw new Error;
-	}
-}

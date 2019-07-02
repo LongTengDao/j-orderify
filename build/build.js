@@ -1,26 +1,30 @@
 'use strict';
 
-require('../test/test.js')(async ({ build, get, map }) => {
+require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
+	
+	const zhs = `返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。`;
+	const en = `Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.`;
 	
 	await build({
 		name: 'j-orderify',
-		Name: '@ltd/j-orderify',
+		user: 'LongTengDao@ltd',
 		Desc: `
-			返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。
-			Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.`,
+			${zhs}
+			${en}`,
+		Auth: 龙腾道,
+		Copy: 'LGPL-3.0',
 		semver: await get('src/version'),
 		ES: 6,
 		ESM: true,
 		NPM: {
-			meta_: {
-				description: 'Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.／返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。',
-			}
+			description: `${en}／${zhs}`,
 		},
 		UMD: {
-			main_global: 'orderify',
+			main_global: 'Ordered',
 		},
+		LICENSE_: true,
 	});
 	
-	await map('docs/README.md', string => string.replace(/(\n```+)[^`\r\n]+/g, '$1'), 'dist/NPM/README.md');
+	await map('docs/README.md', 'dist/NPM/README.md');
 	
 });

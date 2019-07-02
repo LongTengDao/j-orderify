@@ -8,6 +8,7 @@ Editions Description
 | `ESM/j-orderify.d.ts`          | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
 | `ESM/.j-orderify.js`           | The edition for [`@ltd/j-dev`][jDev-en] further bundling (with global variable reference optimizing reserved). |
 | `ESM/.j-orderify.d.ts`         | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
+|                                |                                                                                                                |
 | `UMD/j-orderify.js`            | The edition built as [`UMD`][UMD-en] (width source mapper inline).                                             |
 | `UMD/j-orderify.d.ts`          | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
 | `UMD/j-orderify.min.js`        | The edition built as minified [`UMD`][UMD-en].                                                                 |
@@ -15,6 +16,7 @@ Editions Description
 | `UMD/j-orderify.min.js.gz`     | The gzip file (only if smaller) of the edition built as minified [`UMD`][UMD-en].                              |
 | `UMD/j-orderify.min.js.map`    | The source mapper of the edition built as minified [`UMD`][UMD-en].                                            |
 | `UMD/j-orderify.min.js.map.gz` | The gzip file (only if smaller) of the source mapper of the edition built as minified [`UMD`][UMD-en].         |
+|                                |                                                                                                                |
 | `NPM/`                         | The edition published on [`NPM`][NPM-en]. ※ `@ltd/j-orderify` is not `j-orderify`!                            |
 
 [jDev-en]: https://www.npmjs.com/package/@ltd/j-dev
@@ -31,6 +33,7 @@ Editions Description
 | `ESM/j-orderify.d.ts`          | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
 | `ESM/.j-orderify.js`           | 供 [`@ltd/j-dev`][jDev-zhs] 二度打包的版本（保留全局变量引用优化）。                                           |
 | `ESM/.j-orderify.d.ts`         | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
+|                                |                                                                                                                |
 | `UMD/j-orderify.js`            | 封装为 [`UMD`][UMD-zhs] 的版本（内联源映射内容）。                                                             |
 | `UMD/j-orderify.d.ts`          | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
 | `UMD/j-orderify.min.js`        | 封装为 [`UMD`][UMD-zhs] 的最小化版本。                                                                         |
@@ -38,6 +41,7 @@ Editions Description
 | `UMD/j-orderify.min.js.gz`     | 封装为 [`UMD`][UMD-zhs] 的最小化版本的压缩版本（如果更小的话）。                                               |
 | `UMD/j-orderify.min.js.map`    | 封装为 [`UMD`][UMD-zhs] 的最小化版本的源映射文件。                                                             |
 | `UMD/j-orderify.min.js.map.gz` | 封装为 [`UMD`][UMD-zhs] 的最小化版本的源映射文件的压缩版本（如果更小的话）。                                   |
+|                                |                                                                                                                |
 | `NPM/`                         | 发布在 [`NPM`][NPM-zhs] 上的版本。※ `@ltd/j-orderify` 不是 `j-orderify`！                                     |
 
 [jDev-zhs]: https://www.npmjs.com/package/@ltd/j-dev
