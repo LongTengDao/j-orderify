@@ -32,7 +32,7 @@ const undefined$1 = void 0;
 
 const isArray = Array.isArray;
 
-const version = '5.0.0';
+const version = '5.1.0';
 
 const Keeper = Set;
 const target2keeper = new WeakMap;

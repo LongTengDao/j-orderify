@@ -1,8 +1,8 @@
 ﻿/*!
  * 模块名称：j-orderify
- * 模块功能：返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。
-   　　　　　Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string.
- * 模块版本：5.0.0
+ * 模块功能：返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。从属于“简计划”。
+   　　　　　Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string. Belong to "Plan J".
+ * 模块版本：5.1.0
  * 许可条款：LGPL-3.0
  * 所属作者：龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)
  * 问题反馈：https://GitHub.com/LongTengDao/j-orderify/issues
@@ -41,7 +41,7 @@ const undefined$1 = void 0;
 
 const isArray = Array.isArray;
 
-const version = '5.0.0';
+const version = '5.1.0';
 
 const Keeper = Set;
 const target2keeper = new WeakMap;
