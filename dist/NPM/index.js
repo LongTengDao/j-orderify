@@ -32,23 +32,19 @@ const undefined$1 = void 0;
 
 const isArray = Array.isArray;
 
-const version = '5.1.0';
+const version = '5.2.0';
 
 const Keeper = Set;
 const target2keeper = new WeakMap;
 const proxy2target = new WeakMap;
 const target2proxy = new WeakMap;
-const setDescriptor = /*#__PURE__*/ function () {
-    var setDescriptor = create(null);
-    setDescriptor.value = undefined$1;
-    setDescriptor.writable = true;
-    setDescriptor.enumerable = true;
-    setDescriptor.configurable = true;
-    return setDescriptor;
-}();
-const handlers = 
-/*#__PURE__*/
-assign(create(null), {
+const setDescriptor = /*#__PURE__*/ assign(create(null), {
+    value: undefined$1,
+    writable: true,
+    enumerable: true,
+    configurable: true,
+});
+const handlers = /*#__PURE__*/ assign(create(null), {
     apply(Function, thisArg, args) {
         return orderify(apply(Function, thisArg, args));
     },
@@ -315,20 +311,26 @@ const { fromEntries: fromEntries$1 } = {
                 create(target, getOwnPropertyDescriptors(proto)), keeper);
     }
 };
-const _export = (
-/*#__PURE__*/
-freeze({
-    version,
-    isOrdered,
-    is: is$1,
-    orderify,
-    create: create$1,
-    defineProperties: defineProperties$1,
-    NULL,
-    fromEntries: fromEntries$1,
-    getOwnPropertyDescriptors,
-    get default() { return this; },
-}));
+const _export = /*#__PURE__*/ (function () {
+    const exports = create(null);
+    assign(exports, {
+        version,
+        isOrdered,
+        is: is$1,
+        orderify,
+        create: create$1,
+        defineProperties: defineProperties$1,
+        NULL,
+        fromEntries: fromEntries$1,
+        getOwnPropertyDescriptors,
+        default: exports,
+    });
+    var descriptor = create(null);
+    descriptor.value = 'Module';
+    defineProperty(exports, Symbol.toStringTag, descriptor);
+    freeze(exports);
+    return exports;
+})();
 
 module.exports = _export;
 

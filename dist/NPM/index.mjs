@@ -2,7 +2,7 @@
  * 模块名称：j-orderify
  * 模块功能：返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。从属于“简计划”。
    　　　　　Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string. Belong to "Plan J".
- * 模块版本：5.1.0
+ * 模块版本：5.2.0
  * 许可条款：LGPL-3.0
  * 所属作者：龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)
  * 问题反馈：https://GitHub.com/LongTengDao/j-orderify/issues
@@ -41,23 +41,19 @@ const undefined$1 = void 0;
 
 const isArray = Array.isArray;
 
-const version = '5.1.0';
+const version = '5.2.0';
 
 const Keeper = Set;
 const target2keeper = new WeakMap;
 const proxy2target = new WeakMap;
 const target2proxy = new WeakMap;
-const setDescriptor = /*#__PURE__*/ function () {
-    var setDescriptor = create(null);
-    setDescriptor.value = undefined$1;
-    setDescriptor.writable = true;
-    setDescriptor.enumerable = true;
-    setDescriptor.configurable = true;
-    return setDescriptor;
-}();
-const handlers = 
-/*#__PURE__*/
-assign(create(null), {
+const setDescriptor = /*#__PURE__*/ assign(create(null), {
+    value: undefined$1,
+    writable: true,
+    enumerable: true,
+    configurable: true,
+});
+const handlers = /*#__PURE__*/ assign(create(null), {
     apply(Function, thisArg, args) {
         return orderify(apply(Function, thisArg, args));
     },
@@ -324,20 +320,26 @@ const { fromEntries: fromEntries$1 } = {
                 create(target, getOwnPropertyDescriptors(proto)), keeper);
     }
 };
-const _export = (
-/*#__PURE__*/
-freeze({
-    version,
-    isOrdered,
-    is: is$1,
-    orderify,
-    create: create$1,
-    defineProperties: defineProperties$1,
-    NULL,
-    fromEntries: fromEntries$1,
-    getOwnPropertyDescriptors,
-    get default() { return this; },
-}));
+const _export = /*#__PURE__*/ (function () {
+    const exports = create(null);
+    assign(exports, {
+        version,
+        isOrdered,
+        is: is$1,
+        orderify,
+        create: create$1,
+        defineProperties: defineProperties$1,
+        NULL,
+        fromEntries: fromEntries$1,
+        getOwnPropertyDescriptors,
+        default: exports,
+    });
+    var descriptor = create(null);
+    descriptor.value = 'Module';
+    defineProperty(exports, Symbol.toStringTag, descriptor);
+    freeze(exports);
+    return exports;
+})();
 
 export default _export;
 export { NULL, create$1 as create, defineProperties$1 as defineProperties, fromEntries$1 as fromEntries, getOwnPropertyDescriptors, is$1 as is, isOrdered, orderify, version };

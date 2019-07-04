@@ -21,54 +21,50 @@ const target2keeper :WeakMap<Target, Keeper> = new WeakMap;
 const proxy2target :WeakMap<Proxy, Target> = new WeakMap;
 const target2proxy :WeakMap<Target, Proxy> = new WeakMap;
 
-const setDescriptor = /*#__PURE__*/ function () {
-	var setDescriptor :PropertyDescriptor = Object.create(null);
-	setDescriptor.value = undefined;
-	setDescriptor.writable = true;
-	setDescriptor.enumerable = true;
-	setDescriptor.configurable = true;
-	return setDescriptor;
-}();
-const handlers :object =
-	/*#__PURE__*/
-	Object.assign(Object.create(null), {
-		apply (Function :{ (...args :any[]) :any }, thisArg :any, args :any[]) {
-			return orderify(Reflect.apply(Function, thisArg, args));
-		},
-		construct (Class :{ new (...args :any[]) :any }, args :any[], newTarget :any) {
-			return orderify(Reflect.construct(Class, args, newTarget));
-		},
-		defineProperty (target :{}, key :Key, descriptor :PropertyDescriptor) :boolean {
-			if ( Reflect.defineProperty(target, key, PartialDescriptor(descriptor)) ) {
-				target2keeper.get(target)!.add(key);
-				return true;
-			}
+const setDescriptor = /*#__PURE__*/Object.assign(Object.create(null), {
+	value: undefined,
+	writable: true,
+	enumerable: true,
+	configurable: true,
+});
+const handlers = /*#__PURE__*/Object.assign(Object.create(null), {
+	apply (Function :{ (...args :any[]) :any }, thisArg :any, args :any[]) {
+		return orderify(Reflect.apply(Function, thisArg, args));
+	},
+	construct (Class :{ new (...args :any[]) :any }, args :any[], newTarget :any) {
+		return orderify(Reflect.construct(Class, args, newTarget));
+	},
+	defineProperty (target :{}, key :Key, descriptor :PropertyDescriptor) :boolean {
+		if ( Reflect.defineProperty(target, key, PartialDescriptor(descriptor)) ) {
+			target2keeper.get(target)!.add(key);
+			return true;
+		}
+		return false;
+	},
+	deleteProperty (target :{}, key :Key) :boolean {
+		if ( Reflect.deleteProperty(target, key) ) {
+			target2keeper.get(target)!.delete(key);
+			return true;
+		}
+		return false;
+	},
+	ownKeys (target :{}) :Key[] {
+		return [ ...target2keeper.get(target)! ];
+	},
+	set (target :{}, key :Key, value :any, receiver :{}) :boolean {
+		if ( key in target ) { return Reflect.set(target, key, value, receiver); }
+		setDescriptor.value = value;
+		if ( Reflect.defineProperty(target, key, setDescriptor) ) {
+			target2keeper.get(target)!.add(key);
+			setDescriptor.value = undefined;
+			return true;
+		}
+		else {
+			setDescriptor.value = undefined;
 			return false;
-		},
-		deleteProperty (target :{}, key :Key) :boolean {
-			if ( Reflect.deleteProperty(target, key) ) {
-				target2keeper.get(target)!.delete(key);
-				return true;
-			}
-			return false;
-		},
-		ownKeys (target :{}) :Key[] {
-			return [...target2keeper.get(target)!];
-		},
-		set (target :{}, key :Key, value :any, receiver :{}) :boolean {
-			if ( key in target ) { return Reflect.set(target, key, value, receiver); }
-			setDescriptor.value = value;
-			if ( Reflect.defineProperty(target, key, setDescriptor) ) {
-				target2keeper.get(target)!.add(key);
-				setDescriptor.value = undefined;
-				return true;
-			}
-			else {
-				setDescriptor.value = undefined;
-				return false;
-			}
-		},
-	});
+		}
+	},
+});
 
 function newProxy<O extends object> (target :O, keeper :Keeper) :O {
 	target2keeper.set(target, keeper);
@@ -253,7 +249,7 @@ export const NULL :typeof import('./export.d').NULL =
 		Object.freeze(NULL);
 		return NULL;
 	}();
-export type NULL<V> = import('./export.d').NULL<V>;
+export type NULL<ValueType> = import('./export.d').NULL<ValueType>;
 
 const PropertyKey :any =
 	/*#__PURE__*/ new Proxy({}, { get<Key extends string | symbol> (target :{}, key :Key) :Key { return key; } });
@@ -276,9 +272,9 @@ export const { fromEntries } = {
 	}
 };
 
-export default (
-	/*#__PURE__*/
-	Object.freeze({
+export default /*#__PURE__*/ ( function () {
+	const exports = Object.create(null);
+	Object.assign(exports, {
 		version,
 		isOrdered,
 		is,
@@ -288,6 +284,11 @@ export default (
 		NULL,
 		fromEntries,
 		getOwnPropertyDescriptors,
-		get default () { return this; },
-	})
-);
+		default: exports,
+	});
+	var descriptor = Object.create(null);
+	descriptor.value = 'Module';
+	Object.defineProperty(exports, Symbol.toStringTag, descriptor);
+	Object.freeze(exports);
+	return exports;
+} )();
