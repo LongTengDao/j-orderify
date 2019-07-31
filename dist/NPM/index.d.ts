@@ -2,7 +2,7 @@ import { NULL } from './export';
 export = exports;
 declare namespace exports {
 	
-	export const version :'5.2.0';
+	export const version :'5.2.1';
 	
 	export function isOrdered (object :object) :boolean;
 	
