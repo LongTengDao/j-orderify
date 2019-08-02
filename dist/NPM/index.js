@@ -32,7 +32,33 @@ const undefined$1 = void 0;
 
 const isArray = Array.isArray;
 
-const version = '5.2.1';
+const version = '5.3.0';
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
+const toStringTag = typeof Symbol!=='undefined' ? Symbol.toStringTag : undefined;
+
+const seal = Object.seal;
+
+const Default = (
+	/*! j-globals: default (internal) */
+	function Default (exports, addOnOrigin) {
+		return /*#__PURE__*/ function Module (exports, addOnOrigin) {
+			if ( !addOnOrigin ) { addOnOrigin = exports; exports = Object_create(null); }
+			if ( Object_assign ) { Object_assign(exports, addOnOrigin); }
+			else { for ( var key in addOnOrigin ) { if ( hasOwnProperty.call(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
+			exports['default'] = exports;
+			typeof exports==='function' && exports.prototype && seal(exports.prototype);
+			if ( toStringTag ) {
+				var descriptor = Object_create(null);
+				descriptor.value = 'Module';
+				Object_defineProperty(exports, toStringTag, descriptor);
+			}
+			return Object_freeze(exports);
+		}(exports, addOnOrigin);
+	}
+	/*¡ j-globals: default (internal) */
+);
 
 const Keeper = Set;
 const target2keeper                          = new WeakMap;
@@ -288,27 +314,17 @@ const { fromEntries } = {
 		);
 	}
 };
-
-const _export = /*#__PURE__*/ ( function () {
-	const exports = Object_create(null);
-	Object_assign(exports, {
-		version,
-		isOrdered,
-		is,
-		orderify,
-		create,
-		defineProperties,
-		NULL,
-		fromEntries,
-		getOwnPropertyDescriptors,
-		default: exports,
-	});
-	var descriptor = Object_create(null);
-	descriptor.value = 'Module';
-	Object_defineProperty(exports, Symbol.toStringTag, descriptor);
-	Object_freeze(exports);
-	return exports;
-} )();
+const _export = Default({
+	version,
+	isOrdered,
+	is,
+	orderify,
+	create,
+	defineProperties,
+	NULL,
+	fromEntries,
+	getOwnPropertyDescriptors,
+});
 
 module.exports = _export;
 

@@ -1,4 +1,4 @@
-export const version :'5.2.1';
+export const version :'5.3.0';
 
 export function isOrdered (object :object) :boolean;
 

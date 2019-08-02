@@ -284,23 +284,15 @@ export const { fromEntries } = {
 	}
 };
 
-export default /*#__PURE__*/ ( function () {
-	const exports = Object_create(null);
-	Object_assign(exports, {
-		version,
-		isOrdered,
-		is,
-		orderify,
-		create,
-		defineProperties,
-		NULL,
-		fromEntries,
-		getOwnPropertyDescriptors,
-		default: exports,
-	});
-	var descriptor = Object_create(null);
-	descriptor.value = 'Module';
-	Object_defineProperty(exports, Symbol.toStringTag, descriptor);
-	Object_freeze(exports);
-	return exports;
-} )();
+import Default from '.default';
+export default Default({
+	version,
+	isOrdered,
+	is,
+	orderify,
+	create,
+	defineProperties,
+	NULL,
+	fromEntries,
+	getOwnPropertyDescriptors,
+});
