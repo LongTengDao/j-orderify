@@ -16,12 +16,8 @@ require('../test/test.js')(async ({ build, 龙腾道, get, map }) => {
 		semver: await get('src/version'),
 		ES: 6,
 		ESM: true,
-		NPM: {
-			description: `${en}／${zhs}`,
-		},
-		UMD: {
-			main_global: 'Ordered',
-		},
+		NPM: { description: `${en}／${zhs}` },
+		UMD: { main_global: 'Ordered' },
 		LICENSE_: true,
 	});
 	
