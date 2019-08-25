@@ -1,7 +1,5 @@
 ﻿
 ```js
-"use strict";
-
 function assign (object) {
     object[Symbol("A")] = "1. symbol";
     object["_________"] = "2. string";
@@ -55,5 +53,4 @@ for ( const key in ordered ) {
     // "5. string"
     // "6. string (decimal integer)"
 }
-
 ```

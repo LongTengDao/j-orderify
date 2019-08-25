@@ -10,8 +10,6 @@ const Object_defineProperty = Object.defineProperty;
 
 const Object_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
-const Object_defineProperties = Object.defineProperties;
-
 const Object_fromEntries = Object.fromEntries;
 
 const Object_freeze = Object.freeze;
@@ -30,9 +28,15 @@ const Reflect_ownKeys = Reflect.ownKeys;
 
 const undefined$1 = void 0;
 
-const isArray = Array.isArray;
+const Null_prototype = (
+	/*! j-globals: null.prototype (internal) */
+	Object.create
+		? /*#__PURE__*/ Object.preventExtensions(Object.create(null))
+		: null
+	/*¡ j-globals: null.prototype (internal) */
+);
 
-const version = '5.3.0';
+const version = '6.0.0';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -44,13 +48,13 @@ const Default = (
 	/*! j-globals: default (internal) */
 	function Default (exports, addOnOrigin) {
 		return /*#__PURE__*/ function Module (exports, addOnOrigin) {
-			if ( !addOnOrigin ) { addOnOrigin = exports; exports = Object_create(null); }
+			if ( !addOnOrigin ) { addOnOrigin = exports; exports = Object_create(Null_prototype); }
 			if ( Object_assign ) { Object_assign(exports, addOnOrigin); }
 			else { for ( var key in addOnOrigin ) { if ( hasOwnProperty.call(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
 			exports['default'] = exports;
 			typeof exports==='function' && exports.prototype && seal(exports.prototype);
 			if ( toStringTag ) {
-				var descriptor = Object_create(null);
+				var descriptor = Object_create(Null_prototype);
 				descriptor.value = 'Module';
 				Object_defineProperty(exports, toStringTag, descriptor);
 			}
@@ -65,13 +69,13 @@ const target2keeper                          = new WeakMap;
 const proxy2target                         = new WeakMap;
 const target2proxy                         = new WeakMap;
 
-const setDescriptor = /*#__PURE__*/Object_assign(Object_create(null), {
+const setDescriptor = /*#__PURE__*/ Object_assign(Object_create(Null_prototype), {
 	value: undefined$1,
 	writable: true,
 	enumerable: true,
 	configurable: true,
 });
-const handlers = /*#__PURE__*/Object_assign(Object_create(null), {
+const handlers = /*#__PURE__*/ Object_assign(Object_create(Null_prototype), {
 	apply (Function                           , thisArg     , args       ) {
 		return orderify(Reflect_apply(Function, thisArg, args));
 	},
@@ -112,7 +116,7 @@ const handlers = /*#__PURE__*/Object_assign(Object_create(null), {
 
 function newProxy                   (target   , keeper        )    {
 	target2keeper.set(target, keeper);
-	const proxy    = new Proxy(target, handlers);
+	const proxy = new Proxy   (target, handlers);
 	proxy2target.set(proxy, target);
 	return proxy;
 }
@@ -134,7 +138,7 @@ const { is } = {
 const { orderify } = {
 	orderify                   (object   )    {
 		if ( proxy2target.has(object) ) { return object; }
-		let proxy                = target2proxy.get(object)                 ;
+		let proxy = target2proxy.get(object)                 ;
 		if ( proxy ) { return proxy; }
 		proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
 		target2proxy.set(object, proxy);
@@ -152,7 +156,7 @@ function getInternal (object        )                                           
 }
 
 function PartialDescriptor                               (source   )    {
-	const target    = Object_create(null);
+	const target = Object_create(Null_prototype)     ;
 	if ( source.hasOwnProperty('value') ) {
 		target.value = source.value;
 		if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
@@ -168,7 +172,7 @@ function PartialDescriptor                               (source   )    {
 	return target;
 }
 function InternalDescriptor                               (source   )    {
-	const target    = Object_create(null);
+	const target = Object_create(Null_prototype)     ;
 	if ( source.hasOwnProperty('value') ) {
 		target.value = source.value;
 		target.writable = source.writable;
@@ -182,7 +186,7 @@ function InternalDescriptor                               (source   )    {
 	return target;
 }
 function ExternalDescriptor                               (source   )    {
-	const target    = Object_create(null);
+	const target = Object_create(Null_prototype)     ;
 	if ( source.hasOwnProperty('value') ) { target.value = source.value; }
 	if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
 	if ( source.hasOwnProperty('get') ) { target.get = source.get; }
@@ -195,18 +199,15 @@ function ExternalDescriptor                               (source   )    {
                                                                                        
 const { create } = {
 	create                                                          (proto          , descriptorMap     )                                                                  {
-		if ( descriptorMap===undefined$1 ) { return newProxy(Object_create(proto), new Keeper); }
-		const target = Object_create(proto);
-		const keeper         = new Keeper;
-		for ( let lastIndex         = arguments.length-1, index         = 1; ; descriptorMap = arguments[++index] ) {
-			const keys = Reflect_ownKeys(descriptorMap );
-			for ( let length         = keys.length, index         = 0; index<length; ++index ) {
-				const key = keys[index];
-				Object_defineProperty(target, key, ExternalDescriptor(descriptorMap [key]));
-				keeper.add(key);
-			}
-			if ( index===lastIndex ) { return newProxy(target, keeper); }
+		if ( arguments.length<2 ) { return newProxy(Object_create(proto)       , new Keeper); }
+		const keeper                      = new Keeper;
+		descriptorMap = arguments[0] = newProxy(Object_create(Null_prototype), keeper)      ;
+		Reflect_apply(Object_assign, null, arguments                             );
+		const target = Object_create(proto, descriptorMap )       ;
+		for ( const key of keeper ) {
+			descriptorMap [key] = ExternalDescriptor(descriptorMap [key]);
 		}
+		return newProxy(target, keeper);
 	}
 };
 const { defineProperties } = {
@@ -226,7 +227,7 @@ const { defineProperties } = {
 
 const { getOwnPropertyDescriptors } = {
 	getOwnPropertyDescriptors                   (object   )                                                    {
-		const descriptors = Object_create(null);
+		const descriptors = Object_create(Null_prototype)       ;
 		const keeper         = new Keeper;
 		const keys = Reflect_ownKeys(object);
 		for ( let length         = keys.length, index         = 0; index<length; ++index ) {
@@ -238,64 +239,25 @@ const { getOwnPropertyDescriptors } = {
 	}
 };
 
-function keeperAddKeys (keeper        , object    )       {
-	const keys        = Reflect_ownKeys(object);
-	for ( let length         = keys.length, index         = 0; index<length; ++index ) {
-		keeper.add(keys[index]);
+const NULL = /*#__PURE__*/ function (         ) {
+	function throwConstructing ()        { throw TypeError(`Super constructor NULL cannot be invoked with 'new'`); }
+	function throwApplying ()        { throw TypeError(`Super constructor NULL cannot be invoked without 'new'`); }
+	function NULL (            ) {
+		return new.target
+			? new.target===NULL
+				? /*#__PURE__*/ throwConstructing()
+				: /*#__PURE__*/ newProxy(this, new Keeper)
+			: /*#__PURE__*/ throwApplying();
 	}
-}
-function NULL_from (source           , define         )      {
-	const target = Object_create(null);
-	const keeper         = new Keeper;
-	if ( define ) {
-		if ( isArray(source) ) {
-			for ( let length         = source.length, index         = 0; index<length; ++index ) {
-				const descriptorMap = getOwnPropertyDescriptors(source[index]);
-				Object_defineProperties(target, descriptorMap);
-				keeperAddKeys(keeper, descriptorMap);
-			}
-		}
-		else {
-			const descriptorMap = getOwnPropertyDescriptors(source);
-			Object_defineProperties(target, descriptorMap);
-			keeperAddKeys(keeper, descriptorMap);
-		}
-	}
-	else {
-		if ( isArray(source) ) {
-			Object_assign(target, ...source);
-			for ( let length         = source.length, index         = 0; index<length; ++index ) {
-				keeperAddKeys(keeper, source[index]);
-			}
-		}
-		else {
-			Object_assign(target, source);
-			keeperAddKeys(keeper, source);
-		}
-	}
-	return newProxy(target, keeper);
-}
-function throwConstructing ()        { throw TypeError(`NULL cannot be invoked with 'new'`); }
-const NULL                                   =
-	/*#__PURE__*/
-	function (         ) {
-		const NULL      = function                (              source          , define          )    {
-			return new.target
-				? new.target===NULL
-					? /*#__PURE__*/ throwConstructing()
-					: /*#__PURE__*/ newProxy(this, new Keeper)
-				: /*#__PURE__*/ NULL_from(source , define );
-		};
-		NULL.prototype = null;
-		//delete NULL.name;
-		//delete NULL.length;
-		Object_freeze(NULL);
-		return NULL;
-	}();
+	( NULL ).prototype = null;
+	Object_defineProperty(NULL, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
+	//delete NULL.length;
+	Object_freeze(NULL);
+	return NULL;
+}()                                           ;
                                                                    
 
-const PropertyKey      =
-	/*#__PURE__*/ new Proxy({}, { get                              (target    , key     )      { return key; } });
+const PropertyKey      = /*#__PURE__*/ new Proxy({}, { get                              (target    , key     )      { return key; } });
 const { fromEntries } = {
 	fromEntries                                                             (entries                                            , proto           )                      {
 		const keeper         = new Keeper;
@@ -308,7 +270,7 @@ const { fromEntries } = {
 		const target = Object_fromEntries(map);
 		return newProxy(
 			proto===undefined$1 ? target :
-				proto===null ? Object_assign(Object_create(null), target) :
+				proto===null ? Object_assign(Object_create(proto)       , target) :
 					Object_create(target, getOwnPropertyDescriptors(proto)),
 			keeper
 		);

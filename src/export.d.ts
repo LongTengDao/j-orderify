@@ -15,8 +15,6 @@ export function getOwnPropertyDescriptors<O extends object> (object :O) :{ [k in
 export const NULL :{
 	new<ValueType extends any> () :NULL<ValueType>
 	new () :object
-	<_ extends never, Object extends object> (source :Object[] | Object, define? :boolean) :Object
-	<ValueType> (object :object[] | object, define? :boolean) :NULL<ValueType>
 };
 export type NULL<ValueType> = {
 	[key :string] :undefined | ValueType

@@ -1,8 +1,7 @@
-import { NULL } from './export';
 export = exports;
 declare namespace exports {
 	
-	export const version :'5.3.0';
+	export const version :'6.0.0';
 	
 	export function isOrdered (object :object) :boolean;
 	
@@ -19,8 +18,6 @@ declare namespace exports {
 	export const NULL :{
 		new<ValueType extends any> () :NULL<ValueType>
 		new () :object
-		<_ extends never, Object extends object> (source :Object[] | Object, define? :boolean) :Object
-		<ValueType> (object :object[] | object, define? :boolean) :NULL<ValueType>
 	};
 	export type NULL<ValueType> = {
 		[key :string] :undefined | ValueType
