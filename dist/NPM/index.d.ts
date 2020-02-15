@@ -1,7 +1,7 @@
 export = exports;
 declare namespace exports {
 	
-	export const version :'6.0.0';
+	export const version :'7.0.0';
 	
 	export function isOrdered (object :object) :boolean;
 	
@@ -15,11 +15,11 @@ declare namespace exports {
 	
 	export function getOwnPropertyDescriptors<O extends object> (object :O) :{ [k in keyof O] :TypedPropertyDescriptor<O[k]> };
 	
-	export const NULL :{
-		new<ValueType extends any> () :NULL<ValueType>
+	export const Null :{
+		new<ValueType extends any> () :Null<ValueType>
 		new () :object
 	};
-	export type NULL<ValueType> = {
+	export type Null<ValueType> = {
 		[key :string] :undefined | ValueType
 		toString? :ValueType
 		toLocaleString? :ValueType

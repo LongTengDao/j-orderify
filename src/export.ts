@@ -84,29 +84,19 @@ function newProxy<O extends object> (target :O, keeper :Keeper) :O {
 	return proxy;
 }
 
-export const { isOrdered } = {
-	isOrdered (object :object) :boolean {
-		return proxy2target.has(object);
-	}
-};
-export const { is } = {
-	is (object1 :object, object2 :object) :boolean {
-		return Object_is(
-			proxy2target.get(object1) || object1,
-			proxy2target.get(object2) || object2,
-		);
-	}
-};
+export const isOrdered = (object :object) :boolean => proxy2target.has(object);
+export const is = (object1 :object, object2 :object) :boolean => Object_is(
+	proxy2target.get(object1) || object1,
+	proxy2target.get(object2) || object2,
+);
 
-export const { orderify } = {
-	orderify<O extends object> (object :O) :O {
-		if ( proxy2target.has(object) ) { return object; }
-		let proxy = target2proxy.get(object) as O | undefined;
-		if ( proxy ) { return proxy; }
-		proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
-		target2proxy.set(object, proxy);
-		return proxy;
-	}
+export const orderify = <O extends object> (object :O) :O => {
+	if ( proxy2target.has(object) ) { return object; }
+	let proxy = target2proxy.get(object) as O | undefined;
+	if ( proxy ) { return proxy; }
+	proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
+	target2proxy.set(object, proxy);
+	return proxy;
 };
 function getInternal (object :object) :{ target :any, keeper :Keeper, proxy :any } {
 	const target = proxy2target.get(object);
@@ -189,56 +179,53 @@ export const { defineProperties } = {
 	}
 };
 
-export const { getOwnPropertyDescriptors } = {
-	getOwnPropertyDescriptors<O extends object> (object :O) :{ [k in keyof O] :TypedPropertyDescriptor<O[k]> } {
-		const descriptors = Object_create(Null_prototype) as any;
-		const keeper :Keeper = new Keeper;
-		const keys = Reflect_ownKeys(object);
-		for ( let length :number = keys.length, index :number = 0; index<length; ++index ) {
-			const key = keys[index];
-			descriptors[key] = InternalDescriptor(Object_getOwnPropertyDescriptor(object, key)!);
-			keeper.add(key);
-		}
-		return newProxy(descriptors, keeper);
+export const getOwnPropertyDescriptors = <O extends object> (object :O) :{ [k in keyof O] :TypedPropertyDescriptor<O[k]> } => {
+	const descriptors = Object_create(Null_prototype) as any;
+	const keeper :Keeper = new Keeper;
+	const keys = Reflect_ownKeys(object);
+	for ( let length :number = keys.length, index :number = 0; index<length; ++index ) {
+		const key = keys[index];
+		descriptors[key] = InternalDescriptor(Object_getOwnPropertyDescriptor(object, key)!);
+		keeper.add(key);
 	}
+	return newProxy(descriptors, keeper);
 };
 
-export const NULL = /*#__PURE__*/ function (this :any) {
-	function throwConstructing () :never { throw TypeError(`Super constructor NULL cannot be invoked with 'new'`); }
-	function throwApplying () :never { throw TypeError(`Super constructor NULL cannot be invoked without 'new'`); }
-	function NULL (this :object) {
+export const Null = /*#__PURE__*/ function (this :any) {
+	function throwConstructing () :never { throw TypeError(`Super constructor Null cannot be invoked with 'new'`); }
+	function throwApplying () :never { throw TypeError(`Super constructor Null cannot be invoked without 'new'`); }
+	function Null (this :object) {
 		return new.target
-			? new.target===NULL
+			? new.target===Null
 				? /*#__PURE__*/ throwConstructing()
 				: /*#__PURE__*/ newProxy(this, new Keeper)
 			: /*#__PURE__*/ throwApplying();
 	}
-	( NULL ).prototype = null;
-	Object_defineProperty(NULL, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
-	//delete NULL.length;
-	Object_freeze(NULL);
-	return NULL;
-}() as any as typeof import('./export.d').NULL;
-export type NULL<ValueType> = import('./export.d').NULL<ValueType>;
+	//@ts-ignore
+	Null.prototype = null;
+	Object_defineProperty(Null, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
+	//delete Null.length;
+	Object_freeze(Null);
+	return Null;
+}() as any as typeof import('./export.d').Null;
+export type Null<ValueType> = import('./export.d').Null<ValueType>;
 
 const PropertyKey :any = /*#__PURE__*/ new Proxy({}, { get<Key extends string | symbol> (target :{}, key :Key) :Key { return key; } });
-export const { fromEntries } = {
-	fromEntries<K extends string | symbol, V extends any, O extends object> (entries :Iterable<{ readonly 0 :K, readonly 1 :V }>, proto? :null | O) :{ [k in K] :V } & O {
-		const keeper :Keeper = new Keeper;
-		const map :Map<K, V> = new Map;
-		for ( let { 0: key, 1: value } of entries ) {
-			key = PropertyKey[key];
-			keeper.add(key);
-			map.set(key, value);
-		}
-		const target = Object_fromEntries(map);
-		return newProxy(
-			proto===undefined ? target :
-				proto===null ? Object_assign(Object_create(proto) as any, target) :
-					Object_create(target, getOwnPropertyDescriptors(proto)),
-			keeper
-		);
+export const fromEntries = <K extends string | symbol, V extends any, O extends object> (entries :Iterable<{ readonly 0 :K, readonly 1 :V }>, proto? :null | O) :{ [k in K] :V } & O => {
+	const keeper :Keeper = new Keeper;
+	const map :Map<K, V> = new Map;
+	for ( let { 0: key, 1: value } of entries ) {
+		key = PropertyKey[key];
+		keeper.add(key);
+		map.set(key, value);
 	}
+	const target = Object_fromEntries(map);
+	return newProxy(
+		proto===undefined ? target :
+			proto===null ? Object_assign(Object_create(proto) as any, target) :
+				Object_create(target, getOwnPropertyDescriptors(proto)),
+		keeper
+	);
 };
 
 import Default from '.default';
@@ -249,7 +236,7 @@ export default Default({
 	orderify,
 	create,
 	defineProperties,
-	NULL,
+	Null,
 	fromEntries,
 	getOwnPropertyDescriptors,
 });

@@ -12,11 +12,11 @@ export function defineProperties<O extends object, OO extends PropertyDescriptor
 
 export function getOwnPropertyDescriptors<O extends object> (object :O) :{ [k in keyof O] :TypedPropertyDescriptor<O[k]> };
 
-export const NULL :{
-	new<ValueType extends any> () :NULL<ValueType>
+export const Null :{
+	new<ValueType extends any> () :Null<ValueType>
 	new () :object
 };
-export type NULL<ValueType> = {
+export type Null<ValueType> = {
 	[key :string] :undefined | ValueType
 	toString? :ValueType
 	toLocaleString? :ValueType
@@ -42,7 +42,7 @@ declare const exports :{
 	orderify :typeof orderify,
 	create :typeof create,
 	defineProperties :typeof defineProperties,
-	NULL :typeof NULL,
+	Null :typeof Null,
 	fromEntries :typeof fromEntries,
 	getOwnPropertyDescriptors :typeof getOwnPropertyDescriptors,
 	default :typeof exports,

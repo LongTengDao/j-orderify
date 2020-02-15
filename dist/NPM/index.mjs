@@ -2,7 +2,7 @@
  * 模块名称：j-orderify
  * 模块功能：返回一个能保证给定对象的属性按此后添加顺序排列的 proxy，即使键名是 symbol，或整数 string。从属于“简计划”。
    　　　　　Return a proxy for given object, which can guarantee own keys are in setting order, even if the key name is symbol or int string. Belong to "Plan J".
- * 模块版本：6.0.0
+ * 模块版本：7.0.0
  * 许可条款：LGPL-3.0
  * 所属作者：龙腾道 <LongTengDao@LongTengDao.com> (www.LongTengDao.com)
  * 问题反馈：https://GitHub.com/LongTengDao/j-orderify/issues
@@ -45,7 +45,7 @@ const Null_prototype = (
 	/*¡ j-globals: null.prototype (internal) */
 );
 
-const version = '6.0.0';
+const version = '7.0.0';
 
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -130,29 +130,19 @@ function newProxy                   (target   , keeper        )    {
 	return proxy;
 }
 
-const { isOrdered } = {
-	isOrdered (object        )          {
-		return proxy2target.has(object);
-	}
-};
-const { is } = {
-	is (object1        , object2        )          {
-		return Object_is(
-			proxy2target.get(object1) || object1,
-			proxy2target.get(object2) || object2,
-		);
-	}
-};
+const isOrdered = (object        )          => proxy2target.has(object);
+const is = (object1        , object2        )          => Object_is(
+	proxy2target.get(object1) || object1,
+	proxy2target.get(object2) || object2,
+);
 
-const { orderify } = {
-	orderify                   (object   )    {
-		if ( proxy2target.has(object) ) { return object; }
-		let proxy = target2proxy.get(object)                 ;
-		if ( proxy ) { return proxy; }
-		proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
-		target2proxy.set(object, proxy);
-		return proxy;
-	}
+const orderify =                    (object   )    => {
+	if ( proxy2target.has(object) ) { return object; }
+	let proxy = target2proxy.get(object)                 ;
+	if ( proxy ) { return proxy; }
+	proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
+	target2proxy.set(object, proxy);
+	return proxy;
 };
 function getInternal (object        )                                              {
 	const target = proxy2target.get(object);
@@ -234,56 +224,53 @@ const { defineProperties } = {
 	}
 };
 
-const { getOwnPropertyDescriptors } = {
-	getOwnPropertyDescriptors                   (object   )                                                    {
-		const descriptors = Object_create(Null_prototype)       ;
-		const keeper         = new Keeper;
-		const keys = Reflect_ownKeys(object);
-		for ( let length         = keys.length, index         = 0; index<length; ++index ) {
-			const key = keys[index];
-			descriptors[key] = InternalDescriptor(Object_getOwnPropertyDescriptor(object, key) );
-			keeper.add(key);
-		}
-		return newProxy(descriptors, keeper);
+const getOwnPropertyDescriptors =                    (object   )                                                    => {
+	const descriptors = Object_create(Null_prototype)       ;
+	const keeper         = new Keeper;
+	const keys = Reflect_ownKeys(object);
+	for ( let length         = keys.length, index         = 0; index<length; ++index ) {
+		const key = keys[index];
+		descriptors[key] = InternalDescriptor(Object_getOwnPropertyDescriptor(object, key) );
+		keeper.add(key);
 	}
+	return newProxy(descriptors, keeper);
 };
 
-const NULL = /*#__PURE__*/ function (         ) {
-	function throwConstructing ()        { throw TypeError(`Super constructor NULL cannot be invoked with 'new'`); }
-	function throwApplying ()        { throw TypeError(`Super constructor NULL cannot be invoked without 'new'`); }
-	function NULL (            ) {
+const Null = /*#__PURE__*/ function (         ) {
+	function throwConstructing ()        { throw TypeError(`Super constructor Null cannot be invoked with 'new'`); }
+	function throwApplying ()        { throw TypeError(`Super constructor Null cannot be invoked without 'new'`); }
+	function Null (            ) {
 		return new.target
-			? new.target===NULL
+			? new.target===Null
 				? /*#__PURE__*/ throwConstructing()
 				: /*#__PURE__*/ newProxy(this, new Keeper)
 			: /*#__PURE__*/ throwApplying();
 	}
-	( NULL ).prototype = null;
-	Object_defineProperty(NULL, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
-	//delete NULL.length;
-	Object_freeze(NULL);
-	return NULL;
+	//@ts-ignore
+	Null.prototype = null;
+	Object_defineProperty(Null, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
+	//delete Null.length;
+	Object_freeze(Null);
+	return Null;
 }()                                           ;
                                                                    
 
 const PropertyKey      = /*#__PURE__*/ new Proxy({}, { get                              (target    , key     )      { return key; } });
-const { fromEntries } = {
-	fromEntries                                                             (entries                                            , proto           )                      {
-		const keeper         = new Keeper;
-		const map            = new Map;
-		for ( let { 0: key, 1: value } of entries ) {
-			key = PropertyKey[key];
-			keeper.add(key);
-			map.set(key, value);
-		}
-		const target = Object_fromEntries(map);
-		return newProxy(
-			proto===undefined$1 ? target :
-				proto===null ? Object_assign(Object_create(proto)       , target) :
-					Object_create(target, getOwnPropertyDescriptors(proto)),
-			keeper
-		);
+const fromEntries =                                                              (entries                                            , proto           )                      => {
+	const keeper         = new Keeper;
+	const map            = new Map;
+	for ( let { 0: key, 1: value } of entries ) {
+		key = PropertyKey[key];
+		keeper.add(key);
+		map.set(key, value);
 	}
+	const target = Object_fromEntries(map);
+	return newProxy(
+		proto===undefined$1 ? target :
+			proto===null ? Object_assign(Object_create(proto)       , target) :
+				Object_create(target, getOwnPropertyDescriptors(proto)),
+		keeper
+	);
 };
 const _export = Default({
 	version,
@@ -292,13 +279,13 @@ const _export = Default({
 	orderify,
 	create,
 	defineProperties,
-	NULL,
+	Null,
 	fromEntries,
 	getOwnPropertyDescriptors,
 });
 
 export default _export;
-export { NULL, create, defineProperties, fromEntries, getOwnPropertyDescriptors, is, isOrdered, orderify, version };
+export { Null, create, defineProperties, fromEntries, getOwnPropertyDescriptors, is, isOrdered, orderify, version };
 
 /*¡ j-orderify */
 
