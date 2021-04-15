@@ -12,12 +12,11 @@ export function defineProperties<O extends object, OO extends PropertyDescriptor
 
 export function getOwnPropertyDescriptors<O extends object> (object :O) :{ [k in keyof O] :TypedPropertyDescriptor<O[k]> };
 
-export const Null :{
-	new<ValueType extends any> () :Null<ValueType>
-	new () :object
-};
-export type Null<ValueType> = {
-	[key :string] :undefined | ValueType
+export function Null<Constructor extends { new (...args :any) :Null<any> }> (constructor :Constructor) :Constructor;
+export abstract class Null<ValueType = unknown> {
+	protected constructor (arg? :undefined);
+	static readonly prototype :null;
+	[name :string] :undefined | ValueType
 	toString? :ValueType
 	toLocaleString? :ValueType
 	valueOf? :ValueType
@@ -29,8 +28,8 @@ export type Null<ValueType> = {
 	__lookupGetter__? :ValueType
 	__lookupSetter__? :ValueType
 	__proto__? :ValueType
-	constructor? :ValueType
-};
+	['constructor']? :ValueType
+}
 
 export function fromEntries<K extends string | symbol, V extends any, O extends object> (entries :Iterable<{ readonly 0: K, readonly 1: V }>, proto? :null | O) :{ [k in K] :V } & O;
 

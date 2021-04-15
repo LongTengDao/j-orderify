@@ -4,10 +4,15 @@ Editions Description
 
 | Edition                        | Description                                                                                                    |
 |:-------------------------------|:---------------------------------------------------------------------------------------------------------------|
-| `ESM/j-orderify.js`            | Just the bundled edition.                                                                                      |
-| `ESM/j-orderify.d.ts`          | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
 | `ESM/.j-orderify.js`           | The edition for [`@ltd/j-dev`][jDev-en] further bundling (with global variable reference optimizing reserved). |
 | `ESM/.j-orderify.d.ts`         | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
+| `ESM/j-orderify.js`            | Just the bundled edition.                                                                                      |
+| `ESM/j-orderify.d.ts`          | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
+| `ESM/j-orderify.min.js`        | The edition built as minified bundle.                                                                          |
+| `ESM/j-orderify.min.d.ts`      | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
+| `ESM/j-orderify.min.js.gz`     | The gzip file (only if smaller) of the edition built as minified bundle.                                       |
+| `ESM/j-orderify.min.js.map`    | The source mapper of the edition built as minified bundle.                                                     |
+| `ESM/j-orderify.min.js.map.gz` | The gzip file (only if smaller) of the source mapper of the edition built as minified bundle.                  |
 |                                |                                                                                                                |
 | `UMD/j-orderify.js`            | The edition built as [`UMD`][UMD-en] (width source mapper inline).                                             |
 | `UMD/j-orderify.d.ts`          | The corresponding [TypeScript][TS-en] format API declaration file.                                             |
@@ -29,10 +34,15 @@ Editions Description
 
 | 版本                           | 说明                                                                                                           |
 |:-------------------------------|:---------------------------------------------------------------------------------------------------------------|
-| `ESM/j-orderify.js`            | 单纯打包后的版本。                                                                                             |
-| `ESM/j-orderify.d.ts`          | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
 | `ESM/.j-orderify.js`           | 供 [`@ltd/j-dev`][jDev-zhs] 二度打包的版本（保留全局变量引用优化）。                                           |
 | `ESM/.j-orderify.d.ts`         | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
+| `ESM/j-orderify.js`            | 单纯打包后的版本。                                                                                             |
+| `ESM/j-orderify.d.ts`          | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
+| `ESM/j-orderify.min.js`        | 打包后的最小化版本。                                                                                           |
+| `ESM/j-orderify.min.d.ts`      | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |
+| `ESM/j-orderify.min.js.gz`     | 打包后的最小化版本的压缩版本（如果更小的话）。                                                                 |
+| `ESM/j-orderify.min.js.map`    | 打包后的最小化版本的源映射文件。                                                                               |
+| `ESM/j-orderify.min.js.map.gz` | 打包后的最小化版本的源映射文件的压缩版本（如果更小的话）。                                                     |
 |                                |                                                                                                                |
 | `UMD/j-orderify.js`            | 封装为 [`UMD`][UMD-zhs] 的版本（内联源映射内容）。                                                             |
 | `UMD/j-orderify.d.ts`          | 相应的 [TypeScript][TS-zhs] 格式的接口声明文件。                                                               |

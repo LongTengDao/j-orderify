@@ -1,88 +1,97 @@
-import Map from '.Map';
+import TypeError from '.TypeError';
+import WeakMap from '.WeakMap';
+import Proxy from '.Proxy';
 import Object_assign from '.Object.assign';
 import Object_create from '.Object.create';
 import Object_is from '.Object.is';
 import Object_defineProperty from '.Object.defineProperty';
 import Object_getOwnPropertyDescriptor from '.Object.getOwnPropertyDescriptor';
+import Object_defineProperties from '.Object.defineProperties';
 import Object_fromEntries from '.Object.fromEntries';
 import Object_freeze from '.Object.freeze';
-import Proxy from '.Proxy';
+import hasOwnProperty from '.Object.prototype.hasOwnProperty';
 import Reflect_apply from '.Reflect.apply';
 import Reflect_construct from '.Reflect.construct';
 import Reflect_defineProperty from '.Reflect.defineProperty';
 import Reflect_deleteProperty from '.Reflect.deleteProperty';
-import Reflect_set from '.Reflect.set';
 import Reflect_ownKeys from '.Reflect.ownKeys';
-import Set from '.Set';
-import TypeError from '.TypeError';
-import WeakMap from '.WeakMap';
 import undefined from '.undefined';
-import Null_prototype from '.null.prototype';
+import NULL from '.null.prototype';
 
 import version from './version?text';
 export { version };
 
-type Target = object;
-type Proxy = object;
 type Key = string | symbol;
-type Keeper = Set<Key>;
+type KeyOf<O extends object> = Extract<keyof O, Key>;
+type Keeper<T> = T[];
+const Keeper = <T> () :T[] => [];
 
-const Keeper = Set;
-const target2keeper :WeakMap<Target, Keeper> = new WeakMap;
-const proxy2target :WeakMap<Proxy, Target> = new WeakMap;
-const target2proxy :WeakMap<Target, Proxy> = new WeakMap;
+const hasOwnProperty_call = /*#__PURE__*/hasOwnProperty.call.bind(hasOwnProperty);
 
-const setDescriptor = /*#__PURE__*/ Object_assign(Object_create(Null_prototype), {
-	value: undefined,
-	writable: true,
-	enumerable: true,
-	configurable: true,
-});
-const handlers = /*#__PURE__*/ Object_assign(Object_create(Null_prototype), {
-	apply (Function :{ (...args :any[]) :any }, thisArg :any, args :any[]) {
-		return orderify(Reflect_apply(Function, thisArg, args));
-	},
-	construct (Class :{ new (...args :any[]) :any }, args :any[], newTarget :any) {
-		return orderify(Reflect_construct(Class, args, newTarget));
-	},
-	defineProperty (target :{}, key :Key, descriptor :PropertyDescriptor) :boolean {
-		if ( Reflect_defineProperty(target, key, PartialDescriptor(descriptor)) ) {
-			target2keeper.get(target)!.add(key);
+const newWeakMap = () => {
+	const weakMap = new WeakMap;
+	weakMap.has = weakMap.has;
+	weakMap.get = weakMap.get;
+	weakMap.set = weakMap.set;
+	return weakMap;
+};
+const target2keeper = /*#__PURE__*/newWeakMap() as {
+	get <K extends Key> (target:{ [k in K] :any }) :Keeper<K> | undefined;
+	set <K extends Key> (target :{ [k in K] :any }, keeper :Keeper<K>) :void;
+};
+const proxy2target = /*#__PURE__*/newWeakMap() as {
+	has (proxy: object) :boolean;
+	get <O extends object> (proxy: O) :O | undefined;
+	set <O extends object> (proxy :O, target :O) :void;
+};
+const target2proxy = /*#__PURE__*/newWeakMap() as {
+	get <O extends object> (target: O) :O | undefined;
+	set <O extends object> (target :O, proxy :O) :void;
+};
+
+const ExternalDescriptor = <D extends PropertyDescriptor> (source :D) :D => {
+	const target = Object_create(NULL) as D;
+	if ( hasOwnProperty_call(source, 'enumerable') ) { target.enumerable = source.enumerable; }
+	if ( hasOwnProperty_call(source, 'configurable') ) { target.configurable = source.configurable; }
+	if ( hasOwnProperty_call(source, 'value') ) { target.value = source.value; }
+	if ( hasOwnProperty_call(source, 'writable') ) { target.writable = source.writable; }
+	if ( hasOwnProperty_call(source, 'get') ) { target.get = source.get; }
+	if ( hasOwnProperty_call(source, 'set') ) { target.set = source.set; }
+	return target;
+};
+
+const handlers :ProxyHandler<object> = /*#__PURE__*/Object_assign(Object_create(NULL), {
+	defineProperty: <K extends Key> (target :{ [k in K] :any }, key :K, descriptor :PropertyDescriptor) :boolean => {
+		if ( hasOwnProperty_call(target, key) ) {
+			return Reflect_defineProperty(target, key, Object_assign(Object_create(NULL), descriptor));
+		}
+		if ( Reflect_defineProperty(target, key, Object_assign(Object_create(NULL), descriptor)) ) {
+			const keeper = target2keeper.get(target)!;
+			keeper[keeper.length] = key;
 			return true;
 		}
 		return false;
 	},
-	deleteProperty (target :{}, key :Key) :boolean {
+	deleteProperty: <K extends Key> (target :{ [k in K] :any }, key :K) :boolean => {
 		if ( Reflect_deleteProperty(target, key) ) {
-			target2keeper.get(target)!.delete(key);
+			const keeper = target2keeper.get(target)!;
+			const index = keeper.indexOf(key);
+			index<0 || --keeper.copyWithin(index, index + 1).length;
 			return true;
 		}
 		return false;
 	},
-	ownKeys (target :{}) :Key[] {
-		return [ ...target2keeper.get(target)! ];
-	},
-	set (target :{}, key :Key, value :any, receiver :{}) :boolean {
-		if ( key in target ) { return Reflect_set(target, key, value, receiver); }
-		setDescriptor.value = value;
-		if ( Reflect_defineProperty(target, key, setDescriptor) ) {
-			target2keeper.get(target)!.add(key);
-			setDescriptor.value = undefined;
-			return true;
-		}
-		else {
-			setDescriptor.value = undefined;
-			return false;
-		}
-	},
+	ownKeys: <O extends object> (target :O) => target2keeper.get(target) as unknown as KeyOf<O>[],
+	construct: <A extends any[], R extends object> (target :{ new (...args :A) :R }, args :A, newTarget :any) :R => orderify(Reflect_construct(target, args, newTarget)),
+	apply: <T, A extends any[], R extends object> (target :{ (this :T, ...args :A) :R }, thisArg :T, args :A) :R => orderify(Reflect_apply(target, thisArg, args)),
 });
 
-function newProxy<O extends object> (target :O, keeper :Keeper) :O {
+const newProxy = <K extends Key, O extends { [k in K] :any }> (target :O, keeper :Keeper<K>) :O => {
 	target2keeper.set(target, keeper);
 	const proxy = new Proxy<O>(target, handlers);
 	proxy2target.set(proxy, target);
 	return proxy;
-}
+};
 
 export const isOrdered = (object :object) :boolean => proxy2target.has(object);
 export const is = (object1 :object, object2 :object) :boolean => Object_is(
@@ -94,138 +103,98 @@ export const orderify = <O extends object> (object :O) :O => {
 	if ( proxy2target.has(object) ) { return object; }
 	let proxy = target2proxy.get(object) as O | undefined;
 	if ( proxy ) { return proxy; }
-	proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
+	proxy = newProxy(object, Object_assign(Keeper<KeyOf<O>>(), Reflect_ownKeys(object)));
 	target2proxy.set(object, proxy);
 	return proxy;
 };
-function getInternal (object :object) :{ target :any, keeper :Keeper, proxy :any } {
-	const target = proxy2target.get(object);
-	if ( target ) { return { target, keeper: target2keeper.get(target)!, proxy: object }; }
-	let proxy = target2proxy.get(object);
-	if ( proxy ) { return { target: object, keeper: target2keeper.get(object)!, proxy }; }
-	const keeper :Keeper = new Keeper(Reflect_ownKeys(object));
-	target2proxy.set(object, proxy = newProxy(object, keeper));
-	return { target: object, keeper, proxy };
-}
 
-function PartialDescriptor<D extends PropertyDescriptor> (source :D) :D {
-	const target = Object_create(Null_prototype) as D;
-	if ( source.hasOwnProperty('value') ) {
-		target.value = source.value;
-		if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
-	}
-	else if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
-	else if ( source.hasOwnProperty('get') ) {
-		target.get = source.get;
-		if ( source.hasOwnProperty('set') ) { target.set = source.set; }
-	}
-	else if ( source.hasOwnProperty('set') ) { target.set = source.set; }
-	if ( source.hasOwnProperty('enumerable') ) { target.enumerable = source.enumerable; }
-	if ( source.hasOwnProperty('configurable') ) { target.configurable = source.configurable; }
-	return target;
-}
-function InternalDescriptor<D extends PropertyDescriptor> (source :D) :D {
-	const target = Object_create(Null_prototype) as D;
-	if ( source.hasOwnProperty('value') ) {
-		target.value = source.value;
-		target.writable = source.writable;
-	}
-	else {
-		target.get = source.get;
-		target.set = source.set;
-	}
-	target.enumerable = source.enumerable;
-	target.configurable = source.configurable;
-	return target;
-}
-function ExternalDescriptor<D extends PropertyDescriptor> (source :D) :D {
-	const target = Object_create(Null_prototype) as D;
-	if ( source.hasOwnProperty('value') ) { target.value = source.value; }
-	if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
-	if ( source.hasOwnProperty('get') ) { target.get = source.get; }
-	if ( source.hasOwnProperty('set') ) { target.set = source.set; }
-	if ( source.hasOwnProperty('enumerable') ) { target.enumerable = source.enumerable; }
-	if ( source.hasOwnProperty('configurable') ) { target.configurable = source.configurable; }
-	return target;
-}
-
-type TypedPropertyDescriptorMap<O> = { [k in keyof O] :TypedPropertyDescriptor<O[k]> };
+type TypedPropertyDescriptorMap<O extends object> = { [K in KeyOf<O>] :TypedPropertyDescriptor<O[K]> };
 export const { create } = {
-	create<O extends object, OO extends PropertyDescriptorMap = {}> (proto :null | O, descriptorMap? :OO) :( OO extends TypedPropertyDescriptorMap<infer O> ? O : {} ) & O {
-		'use strict';
-		if ( arguments.length<2 ) { return newProxy(Object_create(proto) as any, new Keeper); }
-		const keeper :Set<Key & keyof OO> = new Keeper;
-		descriptorMap = arguments[0] = newProxy(Object_create(Null_prototype), keeper) as OO;
-		Reflect_apply(Object_assign, null, arguments as unknown as [ object, OO ]);
-		const target = Object_create(proto, descriptorMap!) as any;
-		for ( const key of keeper ) {
-			descriptorMap![key] = ExternalDescriptor(descriptorMap![key]);
+	create<O extends object, OO extends PropertyDescriptorMap = {}> (proto :null | O, ...descriptorMaps :OO[]) :( OO extends TypedPropertyDescriptorMap<infer O> ? O : {} ) & O {
+		const keeper = Keeper<KeyOf<OO>>();
+		if ( descriptorMaps.length ) {
+			const descriptorMap :OO = Object_assign(newProxy(Object_create(NULL) as OO, keeper), ...descriptorMaps);
+			const { length } = keeper;
+			let index = 0;
+			while ( index!==length ) {
+				const key = keeper[index++]!;
+				descriptorMap[key] = ExternalDescriptor(descriptorMap[key]);
+			}
+			return newProxy(Object_create(proto, descriptorMap) as any, keeper as any);
 		}
-		return newProxy(target, keeper);
+		return newProxy(Object_create(proto) as any, keeper as any);
 	}
 };
 export const { defineProperties } = {
-	defineProperties<O extends object, OO extends PropertyDescriptorMap> (object :O, descriptorMap :OO) :( OO extends TypedPropertyDescriptorMap<infer O> ? O : never ) & O {
-		const { target, keeper, proxy } = getInternal(object);
-		for ( let lastIndex :number = arguments.length-1, index :number = 1; ; descriptorMap = arguments[++index] ) {
-			const keys = Reflect_ownKeys(descriptorMap);
-			for ( let length :number = keys.length, index :number = 0; index<length; ++index ) {
-				const key = keys[index];
-				Object_defineProperty(target, key, ExternalDescriptor(descriptorMap[key]));
-				keeper.add(key);
-			}
-			if ( index===lastIndex ) { return proxy; }
+	defineProperties<O extends object, OO extends PropertyDescriptorMap> (object :O, descriptorMap :OO, ...descriptorMaps :OO[]) :( OO extends TypedPropertyDescriptorMap<infer O> ? O : never ) & O {
+		const keeper = Keeper<KeyOf<OO>>();
+		descriptorMap = Object_assign(newProxy(Object_create(NULL) as OO, keeper), descriptorMap, ...descriptorMaps);
+		const { length } = keeper;
+		let index = 0;
+		while ( index!==length ) {
+			const key = keeper[index++]!;
+			descriptorMap[key] = ExternalDescriptor(descriptorMap[key]);
 		}
+		return Object_defineProperties(orderify(object), descriptorMap);
 	}
 };
-
-export const getOwnPropertyDescriptors = <O extends object> (object :O) :{ [k in keyof O] :TypedPropertyDescriptor<O[k]> } => {
-	const descriptors = Object_create(Null_prototype) as any;
-	const keeper :Keeper = new Keeper;
-	const keys = Reflect_ownKeys(object);
-	for ( let length :number = keys.length, index :number = 0; index<length; ++index ) {
-		const key = keys[index];
-		descriptors[key] = InternalDescriptor(Object_getOwnPropertyDescriptor(object, key)!);
-		keeper.add(key);
+export const getOwnPropertyDescriptors = <O extends object> (object :O) :TypedPropertyDescriptorMap<O> => {
+	const descriptorMap = Object_create(NULL) as TypedPropertyDescriptorMap<O>;
+	const keeper = Object_assign(Keeper<KeyOf<O>>(), Reflect_ownKeys(object));
+	const { length } = keeper;
+	let index = 0;
+	while ( index!==length ) {
+		const key = keeper[index++];
+		descriptorMap[key] = Object_assign(Object_create(NULL), Object_getOwnPropertyDescriptor(object, key)!);
 	}
-	return newProxy(descriptors, keeper);
+	return newProxy(descriptorMap, keeper);
 };
 
-export const Null = /*#__PURE__*/ function (this :any) {
+export const Null = /*#__PURE__*/function () {
 	function throwConstructing () :never { throw TypeError(`Super constructor Null cannot be invoked with 'new'`); }
 	function throwApplying () :never { throw TypeError(`Super constructor Null cannot be invoked without 'new'`); }
-	function Null (this :object) {
+	const Nullify = (constructor :{ new (...args :any) :any }) => {
+		delete constructor.prototype.constructor;
+		Object_freeze(constructor.prototype);
+		return constructor;
+	};
+	function Null (this :any, constructor? :{ new (...args :any) :any }) {
 		return new.target
 			? new.target===Null
-				? /*#__PURE__*/ throwConstructing()
-				: /*#__PURE__*/ newProxy(this, new Keeper)
-			: /*#__PURE__*/ throwApplying();
+				? /*#__PURE__*/throwConstructing()
+				: /*#__PURE__*/newProxy(this, Keeper<Key>())
+			: typeof constructor==='function'
+				? /*#__PURE__*/Nullify(constructor)
+				: /*#__PURE__*/throwApplying();
 	}
 	//@ts-ignore
 	Null.prototype = null;
-	Object_defineProperty(Null, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
+	Object_defineProperty(Null, 'name', Object_assign(Object_create(NULL), { value: '', configurable: false }));
 	//delete Null.length;
 	Object_freeze(Null);
 	return Null;
 }() as any as typeof import('./export.d').Null;
 export type Null<ValueType> = import('./export.d').Null<ValueType>;
 
-const PropertyKey :any = /*#__PURE__*/ new Proxy({}, { get<Key extends string | symbol> (target :{}, key :Key) :Key { return key; } });
-export const fromEntries = <K extends string | symbol, V extends any, O extends object> (entries :Iterable<{ readonly 0 :K, readonly 1 :V }>, proto? :null | O) :{ [k in K] :V } & O => {
-	const keeper :Keeper = new Keeper;
-	const map :Map<K, V> = new Map;
-	for ( let { 0: key, 1: value } of entries ) {
-		key = PropertyKey[key];
-		keeper.add(key);
-		map.set(key, value);
+const DEFAULT = /*#__PURE__*/Object_assign(class extends null { writable () {} enumerable () {} configurable () {} }.prototype as any as PropertyDescriptor, {
+	constructor: undefined,
+	writable: true,
+	enumerable: true,
+	configurable: true,
+});
+export const fromEntries = <K extends Key, V extends any, O extends object> (entries :Iterable<{ readonly 0 :K, readonly 1 :V }>, proto? :null | O) :{ [k in K] :V } & O => {
+	const target = Object_fromEntries(entries);
+	const keeper :Keeper<K> = Object_assign(Keeper<K>(), Reflect_ownKeys(target));
+	if ( proto===undefined ) { return newProxy(target as { [k in K] :V } & O, keeper); }
+	if ( proto===null ) { return newProxy(Object_assign(Object_create(proto), target) as { [k in K] :V } & O, keeper); }
+	const descriptorMap = Object_create(NULL) as { [k in K] :TypedPropertyDescriptor<V> };
+	const { length } = keeper;
+	let index = 0;
+	while ( index!==length ) {
+		const key :K = keeper[index++]!;
+		( descriptorMap[key] = Object_create(DEFAULT) as TypedPropertyDescriptor<V> ).value = target[key];
 	}
-	const target = Object_fromEntries(map);
-	return newProxy(
-		proto===undefined ? target :
-			proto===null ? Object_assign(Object_create(proto) as any, target) :
-				Object_create(target, getOwnPropertyDescriptors(proto)),
-		keeper
-	);
+	return newProxy(Object_create(proto, descriptorMap) as { [k in K] :V } & O, keeper);
 };
 
 import Default from '.default';

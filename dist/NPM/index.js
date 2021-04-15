@@ -1,5 +1,11 @@
 ﻿'use strict';
 
+const TypeError$1 = TypeError;
+
+const WeakMap$1 = WeakMap;
+
+const Proxy$1 = Proxy;
+
 const Object_assign = Object.assign;
 
 const Object_create = Object.create;
@@ -10,9 +16,13 @@ const Object_defineProperty = Object.defineProperty;
 
 const Object_getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
+const Object_defineProperties = Object.defineProperties;
+
 const Object_fromEntries = Object.fromEntries;
 
 const Object_freeze = Object.freeze;
+
+const hasOwnProperty = Object.prototype.hasOwnProperty;
 
 const Reflect_apply = Reflect.apply;
 
@@ -22,104 +32,114 @@ const Reflect_defineProperty = Reflect.defineProperty;
 
 const Reflect_deleteProperty = Reflect.deleteProperty;
 
-const Reflect_set = Reflect.set;
-
 const Reflect_ownKeys = Reflect.ownKeys;
 
 const undefined$1 = void 0;
 
-const Null_prototype = (
+const NULL = (
 	/*! j-globals: null.prototype (internal) */
-	Object.create
-		? /*#__PURE__*/ Object.preventExtensions(Object.create(null))
+	Object.seal
+		? /*#__PURE__*/Object.preventExtensions(Object.create(null))
 		: null
 	/*¡ j-globals: null.prototype (internal) */
 );
 
-const version = '7.0.0';
+const version = '7.0.1';
 
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+const toStringTag = typeof Symbol==='undefined' ? undefined$1 : Symbol.toStringTag;
 
-const toStringTag = typeof Symbol!=='undefined' ? Symbol.toStringTag : undefined;
-
-const seal = Object.seal;
+var hasOwn = hasOwnProperty.bind
+	? /*#__PURE__*/hasOwnProperty.call.bind(hasOwnProperty)
+	: function (object, key) { return /*#__PURE__*/hasOwnProperty.call(object, key); };// && object!=null
 
 const Default = (
 	/*! j-globals: default (internal) */
 	function Default (exports, addOnOrigin) {
 		return /*#__PURE__*/ function Module (exports, addOnOrigin) {
-			if ( !addOnOrigin ) { addOnOrigin = exports; exports = Object_create(Null_prototype); }
+			if ( !addOnOrigin ) { addOnOrigin = exports; exports = Object_create(NULL); }
 			if ( Object_assign ) { Object_assign(exports, addOnOrigin); }
-			else { for ( var key in addOnOrigin ) { if ( hasOwnProperty.call(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
-			exports['default'] = exports;
-			typeof exports==='function' && exports.prototype && seal(exports.prototype);
+			else { for ( var key in addOnOrigin ) { if ( hasOwn(addOnOrigin, key) ) { exports[key] = addOnOrigin[key]; } } }
+			exports.default = exports;
 			if ( toStringTag ) {
-				var descriptor = Object_create(Null_prototype);
+				var descriptor = Object_create(NULL);
 				descriptor.value = 'Module';
 				Object_defineProperty(exports, toStringTag, descriptor);
 			}
+			typeof exports==='function' && exports.prototype && Object_freeze(exports.prototype);
 			return Object_freeze(exports);
 		}(exports, addOnOrigin);
 	}
 	/*¡ j-globals: default (internal) */
 );
 
-const Keeper = Set;
-const target2keeper                          = new WeakMap;
-const proxy2target                         = new WeakMap;
-const target2proxy                         = new WeakMap;
+const Keeper =     ()      => [];
 
-const setDescriptor = /*#__PURE__*/ Object_assign(Object_create(Null_prototype), {
-	value: undefined$1,
-	writable: true,
-	enumerable: true,
-	configurable: true,
-});
-const handlers = /*#__PURE__*/ Object_assign(Object_create(Null_prototype), {
-	apply (Function                           , thisArg     , args       ) {
-		return orderify(Reflect_apply(Function, thisArg, args));
-	},
-	construct (Class                               , args       , newTarget     ) {
-		return orderify(Reflect_construct(Class, args, newTarget));
-	},
-	defineProperty (target    , key     , descriptor                    )          {
-		if ( Reflect_defineProperty(target, key, PartialDescriptor(descriptor)) ) {
-			target2keeper.get(target) .add(key);
+const hasOwnProperty_call = /*#__PURE__*/hasOwnProperty.call.bind(hasOwnProperty);
+
+const newWeakMap = () => {
+	const weakMap = new WeakMap$1;
+	weakMap.has = weakMap.has;
+	weakMap.get = weakMap.get;
+	weakMap.set = weakMap.set;
+	return weakMap;
+};
+const target2keeper = /*#__PURE__*/newWeakMap()     
+	                                                                      
+	                                                                         
+ ;
+const proxy2target = /*#__PURE__*/newWeakMap()     
+	                             
+	                                                 
+	                                                   
+ ;
+const target2proxy = /*#__PURE__*/newWeakMap()     
+	                                                  
+	                                                   
+ ;
+
+const ExternalDescriptor =                                (source   )    => {
+	const target = Object_create(NULL)     ;
+	if ( hasOwnProperty_call(source, 'enumerable') ) { target.enumerable = source.enumerable; }
+	if ( hasOwnProperty_call(source, 'configurable') ) { target.configurable = source.configurable; }
+	if ( hasOwnProperty_call(source, 'value') ) { target.value = source.value; }
+	if ( hasOwnProperty_call(source, 'writable') ) { target.writable = source.writable; }
+	if ( hasOwnProperty_call(source, 'get') ) { target.get = source.get; }
+	if ( hasOwnProperty_call(source, 'set') ) { target.set = source.set; }
+	return target;
+};
+
+const handlers                       = /*#__PURE__*/Object_assign(Object_create(NULL), {
+	defineProperty:                 (target                   , key   , descriptor                    )          => {
+		if ( hasOwnProperty_call(target, key) ) {
+			return Reflect_defineProperty(target, key, Object_assign(Object_create(NULL), descriptor));
+		}
+		if ( Reflect_defineProperty(target, key, Object_assign(Object_create(NULL), descriptor)) ) {
+			const keeper = target2keeper.get(target) ;
+			keeper[keeper.length] = key;
 			return true;
 		}
 		return false;
 	},
-	deleteProperty (target    , key     )          {
+	deleteProperty:                 (target                   , key   )          => {
 		if ( Reflect_deleteProperty(target, key) ) {
-			target2keeper.get(target) .delete(key);
+			const keeper = target2keeper.get(target) ;
+			const index = keeper.indexOf(key);
+			index<0 || --keeper.copyWithin(index, index + 1).length;
 			return true;
 		}
 		return false;
 	},
-	ownKeys (target    )        {
-		return [ ...target2keeper.get(target)  ];
-	},
-	set (target    , key     , value     , receiver    )          {
-		if ( key in target ) { return Reflect_set(target, key, value, receiver); }
-		setDescriptor.value = value;
-		if ( Reflect_defineProperty(target, key, setDescriptor) ) {
-			target2keeper.get(target) .add(key);
-			setDescriptor.value = undefined$1;
-			return true;
-		}
-		else {
-			setDescriptor.value = undefined$1;
-			return false;
-		}
-	},
+	ownKeys:                    (target   ) => target2keeper.get(target)                         ,
+	construct:                                     (target                         , args   , newTarget     )    => orderify(Reflect_construct(target, args, newTarget)),
+	apply:                                        (target                              , thisArg   , args   )    => orderify(Reflect_apply(target, thisArg, args)),
 });
 
-function newProxy                   (target   , keeper        )    {
+const newProxy =                                              (target   , keeper           )    => {
 	target2keeper.set(target, keeper);
-	const proxy = new Proxy   (target, handlers);
+	const proxy = new Proxy$1   (target, handlers);
 	proxy2target.set(proxy, target);
 	return proxy;
-}
+};
 
 const isOrdered = (object        )          => proxy2target.has(object);
 const is = (object1        , object2        )          => Object_is(
@@ -131,137 +151,98 @@ const orderify =                    (object   )    => {
 	if ( proxy2target.has(object) ) { return object; }
 	let proxy = target2proxy.get(object)                 ;
 	if ( proxy ) { return proxy; }
-	proxy = newProxy(object, new Keeper(Reflect_ownKeys(object)));
+	proxy = newProxy(object, Object_assign(Keeper          (), Reflect_ownKeys(object)));
 	target2proxy.set(object, proxy);
 	return proxy;
 };
-function getInternal (object        )                                              {
-	const target = proxy2target.get(object);
-	if ( target ) { return { target, keeper: target2keeper.get(target) , proxy: object }; }
-	let proxy = target2proxy.get(object);
-	if ( proxy ) { return { target: object, keeper: target2keeper.get(object) , proxy }; }
-	const keeper         = new Keeper(Reflect_ownKeys(object));
-	target2proxy.set(object, proxy = newProxy(object, keeper));
-	return { target: object, keeper, proxy };
-}
 
-function PartialDescriptor                               (source   )    {
-	const target = Object_create(Null_prototype)     ;
-	if ( source.hasOwnProperty('value') ) {
-		target.value = source.value;
-		if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
-	}
-	else if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
-	else if ( source.hasOwnProperty('get') ) {
-		target.get = source.get;
-		if ( source.hasOwnProperty('set') ) { target.set = source.set; }
-	}
-	else if ( source.hasOwnProperty('set') ) { target.set = source.set; }
-	if ( source.hasOwnProperty('enumerable') ) { target.enumerable = source.enumerable; }
-	if ( source.hasOwnProperty('configurable') ) { target.configurable = source.configurable; }
-	return target;
-}
-function InternalDescriptor                               (source   )    {
-	const target = Object_create(Null_prototype)     ;
-	if ( source.hasOwnProperty('value') ) {
-		target.value = source.value;
-		target.writable = source.writable;
-	}
-	else {
-		target.get = source.get;
-		target.set = source.set;
-	}
-	target.enumerable = source.enumerable;
-	target.configurable = source.configurable;
-	return target;
-}
-function ExternalDescriptor                               (source   )    {
-	const target = Object_create(Null_prototype)     ;
-	if ( source.hasOwnProperty('value') ) { target.value = source.value; }
-	if ( source.hasOwnProperty('writable') ) { target.writable = source.writable; }
-	if ( source.hasOwnProperty('get') ) { target.get = source.get; }
-	if ( source.hasOwnProperty('set') ) { target.set = source.set; }
-	if ( source.hasOwnProperty('enumerable') ) { target.enumerable = source.enumerable; }
-	if ( source.hasOwnProperty('configurable') ) { target.configurable = source.configurable; }
-	return target;
-}
-
-                                                                                       
+                                                                                                       
 const { create } = {
-	create                                                          (proto          , descriptorMap     )                                                                  {
-		if ( arguments.length<2 ) { return newProxy(Object_create(proto)       , new Keeper); }
-		const keeper                      = new Keeper;
-		descriptorMap = arguments[0] = newProxy(Object_create(Null_prototype), keeper)      ;
-		Reflect_apply(Object_assign, null, arguments                             );
-		const target = Object_create(proto, descriptorMap )       ;
-		for ( const key of keeper ) {
-			descriptorMap [key] = ExternalDescriptor(descriptorMap [key]);
+	create                                                          (proto          , ...descriptorMaps      )                                                                  {
+		const keeper = Keeper           ();
+		if ( descriptorMaps.length ) {
+			const descriptorMap     = Object_assign(newProxy(Object_create(NULL)      , keeper), ...descriptorMaps);
+			const { length } = keeper;
+			let index = 0;
+			while ( index!==length ) {
+				const key = keeper[index++] ;
+				descriptorMap[key] = ExternalDescriptor(descriptorMap[key]);
+			}
+			return newProxy(Object_create(proto, descriptorMap)       , keeper       );
 		}
-		return newProxy(target, keeper);
+		return newProxy(Object_create(proto)       , keeper       );
 	}
 };
 const { defineProperties } = {
-	defineProperties                                                     (object   , descriptorMap    )                                                                     {
-		const { target, keeper, proxy } = getInternal(object);
-		for ( let lastIndex         = arguments.length-1, index         = 1; ; descriptorMap = arguments[++index] ) {
-			const keys = Reflect_ownKeys(descriptorMap);
-			for ( let length         = keys.length, index         = 0; index<length; ++index ) {
-				const key = keys[index];
-				Object_defineProperty(target, key, ExternalDescriptor(descriptorMap[key]));
-				keeper.add(key);
-			}
-			if ( index===lastIndex ) { return proxy; }
+	defineProperties                                                     (object   , descriptorMap    , ...descriptorMaps      )                                                                     {
+		const keeper = Keeper           ();
+		descriptorMap = Object_assign(newProxy(Object_create(NULL)      , keeper), descriptorMap, ...descriptorMaps);
+		const { length } = keeper;
+		let index = 0;
+		while ( index!==length ) {
+			const key = keeper[index++] ;
+			descriptorMap[key] = ExternalDescriptor(descriptorMap[key]);
 		}
+		return Object_defineProperties(orderify(object), descriptorMap);
 	}
 };
-
-const getOwnPropertyDescriptors =                    (object   )                                                    => {
-	const descriptors = Object_create(Null_prototype)       ;
-	const keeper         = new Keeper;
-	const keys = Reflect_ownKeys(object);
-	for ( let length         = keys.length, index         = 0; index<length; ++index ) {
-		const key = keys[index];
-		descriptors[key] = InternalDescriptor(Object_getOwnPropertyDescriptor(object, key) );
-		keeper.add(key);
+const getOwnPropertyDescriptors =                    (object   )                                => {
+	const descriptorMap = Object_create(NULL)                                 ;
+	const keeper = Object_assign(Keeper          (), Reflect_ownKeys(object));
+	const { length } = keeper;
+	let index = 0;
+	while ( index!==length ) {
+		const key = keeper[index++];
+		descriptorMap[key] = Object_assign(Object_create(NULL), Object_getOwnPropertyDescriptor(object, key) );
 	}
-	return newProxy(descriptors, keeper);
+	return newProxy(descriptorMap, keeper);
 };
 
-const Null = /*#__PURE__*/ function (         ) {
-	function throwConstructing ()        { throw TypeError(`Super constructor Null cannot be invoked with 'new'`); }
-	function throwApplying ()        { throw TypeError(`Super constructor Null cannot be invoked without 'new'`); }
-	function Null (            ) {
+const Null = /*#__PURE__*/function () {
+	function throwConstructing ()        { throw TypeError$1(`Super constructor Null cannot be invoked with 'new'`); }
+	function throwApplying ()        { throw TypeError$1(`Super constructor Null cannot be invoked without 'new'`); }
+	const Nullify = (constructor                             ) => {
+		delete constructor.prototype.constructor;
+		Object_freeze(constructor.prototype);
+		return constructor;
+	};
+	function Null (           constructor                              ) {
 		return new.target
 			? new.target===Null
-				? /*#__PURE__*/ throwConstructing()
-				: /*#__PURE__*/ newProxy(this, new Keeper)
-			: /*#__PURE__*/ throwApplying();
+				? /*#__PURE__*/throwConstructing()
+				: /*#__PURE__*/newProxy(this, Keeper     ())
+			: typeof constructor==='function'
+				? /*#__PURE__*/Nullify(constructor)
+				: /*#__PURE__*/throwApplying();
 	}
 	//@ts-ignore
 	Null.prototype = null;
-	Object_defineProperty(Null, 'name', Object_assign(Object_create(Null_prototype), { value: '' }));
+	Object_defineProperty(Null, 'name', Object_assign(Object_create(NULL), { value: '', configurable: false }));
 	//delete Null.length;
 	Object_freeze(Null);
 	return Null;
 }()                                           ;
                                                                    
 
-const PropertyKey      = /*#__PURE__*/ new Proxy({}, { get                              (target    , key     )      { return key; } });
-const fromEntries =                                                              (entries                                            , proto           )                      => {
-	const keeper         = new Keeper;
-	const map            = new Map;
-	for ( let { 0: key, 1: value } of entries ) {
-		key = PropertyKey[key];
-		keeper.add(key);
-		map.set(key, value);
+const DEFAULT = /*#__PURE__*/Object_assign(class extends null { writable () {} enumerable () {} configurable () {} }.prototype                             , {
+	constructor: undefined$1,
+	writable: true,
+	enumerable: true,
+	configurable: true,
+});
+const fromEntries =                                                  (entries                                            , proto           )                      => {
+	const target = Object_fromEntries(entries);
+	const keeper            = Object_assign(Keeper   (), Reflect_ownKeys(target));
+	if ( proto===undefined$1 ) { return newProxy(target                       , keeper); }
+	if ( proto===null ) { return newProxy(Object_assign(Object_create(proto), target)                       , keeper); }
+	const descriptorMap = Object_create(NULL)                                            ;
+	const { length } = keeper;
+	let index = 0;
+	while ( index!==length ) {
+		const key    = keeper[index++] ;
+		( descriptorMap[key] = Object_create(DEFAULT)                               ).value = target[key];
 	}
-	const target = Object_fromEntries(map);
-	return newProxy(
-		proto===undefined$1 ? target :
-			proto===null ? Object_assign(Object_create(proto)       , target) :
-				Object_create(target, getOwnPropertyDescriptors(proto)),
-		keeper
-	);
+	return newProxy(Object_create(proto, descriptorMap)                       , keeper);
 };
 const _export = Default({
 	version,
